@@ -1,12 +1,3 @@
-# dependencies
-node_modules/
+node_modules
 
-# env files
-.env
-
-# build output
-dist/
-build/
-
-# logs
-*.log
+dist
