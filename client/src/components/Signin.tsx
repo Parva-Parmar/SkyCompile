@@ -1,14 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-export default function Signup() {
+export default function Signin() {
   return (
     <>
       <section className="min-h-screen flex items-center justify-center bg-white">
         <div className="w-full flex justify-center">
           <div className="w-full max-w-md bg-gray-100 rounded-lg p-8 flex flex-col">
             <h2 className="text-gray-900 text-lg font-medium title-font mb-5">
-              Sign Up
+              Create a new account
             </h2>
 
             <div className="relative mb-4">
@@ -42,7 +42,7 @@ export default function Signup() {
             </div>
 
             <button className="text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">
-               <Link to="/dashboard">Sign Up</Link>
+             <Link to="/dashboard">Sign In</Link>
             </button>
           </div>
         </div>

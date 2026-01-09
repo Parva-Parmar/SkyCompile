@@ -1,11 +1,11 @@
 import SigninHeader from "../components/headers/SigninHeader";
-import Signup from "../components/Signup";
+import Signin from "../components/Signin";
 
-export default function SignupPage() {
+export default function SigninPage() {
   return (
     <>
       <SigninHeader />
-      <Signup />
+      <Signin />
     </>
   );
 }
