@@ -52,7 +52,7 @@ export default function Landing() {
           </div>
 
           <button className="flex mx-auto mt-16 text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">
-            <Link to="/signup">Lets build something together</Link>
+            <Link to="/signin">Lets build something together</Link>
           </button>
         </div>
       </section>

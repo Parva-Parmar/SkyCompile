@@ -1,13 +1,14 @@
 import {Request, Response, NextFunction} from "express";
 
-export const singupValidator = (req: Request, res: Response, next: NextFunction) => {
-    const { firstname,lastname, email , password, confirmPassowrd } = req.body;
+export const signupValidator = (req: Request, res: Response, next: NextFunction) => {
+    console.log("BODY:", req.body);
+    const { firstname,lastname, email , password, confirmPassword } = req.body;
 
-    if(!firstname || ! lastname || !email || !password || !confirmPassowrd){
+    if(!firstname || ! lastname || !email || !password || !confirmPassword){
         return res.status(400).json({message: "All fiends are required"});
     }
 
-    if( password !== confirmPassowrd){
+    if( password !== confirmPassword){
         return res.status(400).json({message: "password and confirmpassword do not match"});
     }
 

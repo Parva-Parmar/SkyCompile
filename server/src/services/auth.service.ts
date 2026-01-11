@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import { createUser, findUserByEmail } from "../models/user.model";
+import { generateToken } from "./token.service";
 
 export const signupService = async (data: {
   firstname: string;
@@ -21,4 +22,15 @@ export const signupService = async (data: {
     email: data.email,
     password: hashedPassword,
   });
+};
+
+
+export const signinService = async (data: { email: string; password: string }) => {
+  const user = await findUserByEmail(data.email);
+  if (!user) throw new Error("Invalid credentials");
+
+  const isValid = await bcrypt.compare(data.password, user.password);
+  if (!isValid) throw new Error("Invalid credentials");
+
+  return generateToken(user.id);
 };
