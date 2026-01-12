@@ -1,55 +1,78 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { postRequest } from "../api/http";
 
 export default function Signin() {
+  const navigate = useNavigate();
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [error, setError] = useState<string>("");
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    try {
+      const data = await postRequest("/auth/signin", formData);
+
+      localStorage.setItem("token", data.token);
+
+      navigate("/dashboard");
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
   return (
-    <>
-      <section className="min-h-screen flex items-center justify-center bg-white">
-        <div className="w-full flex justify-center">
-          <div className="w-full max-w-md bg-gray-100 rounded-lg p-8 flex flex-col">
-            <h2 className="text-gray-900 text-lg font-medium title-font mb-5">
-              Sign In
-            </h2>
+    <form
+      onSubmit={handleSubmit}
+      className="min-h-screen flex items-center justify-center bg-white"
+    >
+      <div className="w-full max-w-md bg-gray-100 rounded-lg p-8 flex flex-col">
+        <h2 className="text-gray-900 text-lg font-medium mb-5">
+          Sign In
+        </h2>
 
-            {/* Email */}
-            <div className="relative mb-4">
-              <label
-                htmlFor="email"
-                className="leading-7 text-sm text-gray-600"
-              >
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
-              />
-            </div>
+        <input
+          name="email"
+          type="email"
+          placeholder="Email"
+          onChange={handleChange}
+          className="mb-3 p-2 rounded"
+        />
 
-            {/* Password */}
-            <div className="relative mb-6">
-              <label
-                htmlFor="password"
-                className="leading-7 text-sm text-gray-600"
-              >
-                Password
-              </label>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                className="w-full bg-white rounded border border-gray-300 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 text-base outline-none text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out"
-              />
-            </div>
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          onChange={handleChange}
+          className="mb-4 p-2 rounded"
+        />
 
-            {/* Button */}
-            <button className="text-white bg-indigo-500 border-0 py-2 px-8 focus:outline-none hover:bg-indigo-600 rounded text-lg">
-              <Link to="/dashboard">Sign In</Link>
-            </button>
-          </div>
-        </div>
-      </section>
-    </>
+        <button
+          type="submit"
+          className="bg-indigo-500 text-white py-2 rounded hover:bg-indigo-600"
+        >
+          Sign In
+        </button>
+
+        {error && (
+          <p className="mt-4 text-sm text-center text-red-600">
+            {error}
+          </p>
+        )}
+      </div>
+    </form>
   );
 }

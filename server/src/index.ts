@@ -1,29 +1,21 @@
+import "./env";
 import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/auth.route";
-import dotenv from "dotenv";
-
-dotenv.config();
+import userRoutes from "./routes/user.route";
+import projectRoutes from "./routes/project.route";
+import friendRoutes from "./routes/friend.route";
 
 const app = express();
 
-/**
- * ✅ CORS — MUST be before routes
- */
 app.use(
   cors({
-    origin: "http://localhost:5173", // frontend origin (Vite)
+    origin: "http://localhost:5173",
   })
 );
 
-/**
- * ✅ JSON parser — before routes
- */
 app.use(express.json());
 
-/**
- * ✅ Public landing endpoint
- */
 app.get("/api/v1/landing", (req, res) => {
   res.json({
     appName: "SkyCompile",
@@ -32,11 +24,12 @@ app.get("/api/v1/landing", (req, res) => {
   });
 });
 
-/**
- * ✅ Auth routes
- */
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/projects", projectRoutes);
+app.use("/api/v1/friends", friendRoutes);
 
-app.listen(3000, () => {
-  console.log("Server is running on http://localhost:3000");
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });

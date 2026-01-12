@@ -7,3 +7,36 @@ export async function getLandingData() {
   }
   return res.json();
 }
+
+export async function postRequest(endpoint: string, body: unknown){
+  const res = await fetch(`${API_BASE_URL}${endpoint}`,{
+    method: "POST",
+    headers:{
+      "content-type":"application/json",
+    },
+    body: JSON.stringify(body),
+  } );
+  const data  = await res.json();
+
+  if(!res.ok){
+    throw new Error(data.message || "Request failed");
+  }
+
+  return data;  
+}
+
+export const getAuthRequest = async (url: string) => {
+  const token = localStorage.getItem("token");
+
+  const res = await fetch(`${API_BASE_URL}${url}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Unauthorized");
+  }
+
+  return res.json();
+};
