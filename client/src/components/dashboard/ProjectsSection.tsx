@@ -30,6 +30,7 @@ export default function ProjectsSection() {
 
     const handleDelete = async (id: string) => {
         await deleteProject(id);
+        console.log("DELETED PROJECT ID:", id);
         loadProjects();
     };
 

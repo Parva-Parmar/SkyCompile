@@ -24,14 +24,31 @@ export const getProfileByUserId = async (userId: string) => {
   const result = await pool.query(
     `
     SELECT
+      u.id,
       u.firstname,
       u.lastname,
       u.email,
+
       COUNT(DISTINCT p.id) AS project_count,
-      COUNT(DISTINCT f.friend_id) AS friend_count
+
+      COUNT(DISTINCT
+        CASE
+          WHEN f.requester_id = u.id THEN f.addressee_id
+          WHEN f.addressee_id = u.id THEN f.requester_id
+        END
+      ) AS friend_count
+
     FROM users u
-    LEFT JOIN projects p ON p.owner_id = u.id
-    LEFT JOIN friendships f ON f.user_id = u.id
+
+    LEFT JOIN projects p
+      ON p.owner_id = u.id
+
+    LEFT JOIN friendships f
+      ON (
+        (f.requester_id = u.id OR f.addressee_id = u.id)
+        AND f.status = 'accepted'
+      )
+
     WHERE u.id = $1
     GROUP BY u.id
     `,
@@ -40,3 +57,4 @@ export const getProfileByUserId = async (userId: string) => {
 
   return result.rows[0];
 };
+

@@ -26,11 +26,20 @@ export const signupService = async (data: {
 
 
 export const signinService = async (data: { email: string; password: string }) => {
+  const { email, password } = data;
   const user = await findUserByEmail(data.email);
   if (!user) throw new Error("Invalid credentials");
 
   const isValid = await bcrypt.compare(data.password, user.password);
   if (!isValid) throw new Error("Invalid credentials");
-
-  return generateToken(user.id);
+  const token = generateToken(user.id);
+  return {
+    token,
+    user: {
+      id: user.id,
+      firstname: user.firstname,
+      lastname: user.lastname,
+      email: user.email,
+    },
+  };
 };

@@ -56,11 +56,17 @@ export const postAuthRequest = async (url: string, body: any) => {
 };
 
 export const deleteAuthRequest = async (url: string) => {
+  console.log("delete test")
   const res = await fetch(`${API_BASE_URL}${url}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${getToken()}`,
     },
   });
+
+  if (res.status === 204) {
+    return;
+  }
+  
   return res.json();
 };

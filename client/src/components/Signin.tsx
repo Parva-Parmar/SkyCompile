@@ -25,9 +25,8 @@ export default function Signin() {
 
     try {
       const data = await postRequest("/auth/signin", formData);
-
       localStorage.setItem("token", data.token);
-
+      localStorage.setItem("user", JSON.stringify(data.user));
       navigate("/dashboard");
     } catch (err: any) {
       setError(err.message);
