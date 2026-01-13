@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ ADD
 import {
     getProjects,
     createProject,
@@ -11,6 +12,7 @@ import ProjectCards from "./ProjectCards";
 export default function ProjectsSection() {
     const [projects, setProjects] = useState<Project[]>([]);
     const [newProject, setNewProject] = useState("");
+    const navigate = useNavigate(); // ✅ ADD
 
     const loadProjects = async () => {
         const data = await getProjects();
@@ -30,8 +32,12 @@ export default function ProjectsSection() {
 
     const handleDelete = async (id: string) => {
         await deleteProject(id);
-        console.log("DELETED PROJECT ID:", id);
         loadProjects();
+    };
+
+    // ✅ NEW: open workspace
+    const handleOpenProject = (id: string) => {
+        navigate(`/projects/${id}`);
     };
 
     return (
@@ -45,19 +51,19 @@ export default function ProjectsSection() {
                     className="flex-1 border rounded px-3 py-2"
                 />
                 <button
-                    onClick={() => {
-                        console.log("ADD PROJECT CLICKED");
-                        handleCreate();
-                    }}
+                    onClick={handleCreate}
                     className="bg-indigo-500 text-white px-4 py-2 rounded"
                 >
                     Add Project
                 </button>
-
             </div>
 
             {/* Project List */}
-            <ProjectCards projects={projects} onDelete={handleDelete} />
+            <ProjectCards
+                projects={projects}
+                onDelete={handleDelete}
+                onOpen={handleOpenProject} // ✅ PASS THIS
+            />
         </div>
     );
 }
