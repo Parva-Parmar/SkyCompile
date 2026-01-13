@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import { createUser, findUserByEmail } from "../models/user.model";
+import { createUserProjectFolder } from "../utils/projectFolder";
 import { generateToken } from "./token.service";
 
 export const signupService = async (data: {

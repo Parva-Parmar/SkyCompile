@@ -1,4 +1,8 @@
 import { pool } from "./db";
+import {
+  createProjectFolder,
+  deleteProjectFolder
+} from "../utils/projectFolder";
 
 export const getProjectsByUser = async (userId: string) => {
   const result = await pool.query(
@@ -18,7 +22,10 @@ export const insertProject = async (userId: string, name: string) => {
     [userId, name]
   );
 
-  return result.rows[0];
+  const project = result.rows[0];
+  createProjectFolder(userId, project.id);
+
+  return project;
 };
 
 
@@ -26,11 +33,17 @@ export const deleteProjectById = async (
   userId: string,
   projectId: string
 ) => {
-  await pool.query(
+  const result = await pool.query(
     `
     DELETE FROM projects
     WHERE id = $1 AND owner_id = $2
+    RETURNING id
     `,
     [projectId, userId]
   );
+
+ 
+  if (result.rowCount && result.rowCount > 0) {
+    deleteProjectFolder(userId, projectId);
+  }
 };
