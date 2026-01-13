@@ -1,5 +1,7 @@
 const API_BASE_URL = "http://localhost:3000/api/v1";
 
+const getToken = () => localStorage.getItem("token");
+
 export async function getLandingData() {
   const res = await fetch(`${API_BASE_URL}/landing`);
   if (!res.ok) {
@@ -38,5 +40,27 @@ export const getAuthRequest = async (url: string) => {
     throw new Error("Unauthorized");
   }
 
+  return res.json();
+};
+
+export const postAuthRequest = async (url: string, body: any) => {
+  const res = await fetch(`${API_BASE_URL}${url}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${getToken()}`,
+    },
+    body: JSON.stringify(body),
+  });
+  return res.json();
+};
+
+export const deleteAuthRequest = async (url: string) => {
+  const res = await fetch(`${API_BASE_URL}${url}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  });
   return res.json();
 };

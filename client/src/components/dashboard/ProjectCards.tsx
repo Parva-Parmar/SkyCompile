@@ -1,19 +1,31 @@
-export default function ProjectCards() {
+import type { Project } from "../../api/projects";
+
+interface Props {
+    projects: Project[];
+    onDelete: (id: string) => void; // ✅ UUID
+}
+
+export default function ProjectCards({ projects, onDelete }: Props) {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-            {["Active Editors", "Commits Today", "Collaborators"].map(
-                (title, i) => (
-                    <div
-                        key={i}
-                        className="bg-white p-6 rounded-lg shadow"
-                    >
-                        <h3 className="text-gray-500 text-sm">{title}</h3>
-                        <p className="text-3xl font-bold text-gray-800 mt-2">
-                            {Math.floor(Math.random() * 10)}
-                        </p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {projects.map((project, index) => (
+                <div
+                    key={project.id}
+                    className="border rounded p-4 flex justify-between items-center"
+                >
+                    <div>
+                        <p className="text-sm text-gray-500">#{index + 1}</p>
+                        <h3 className="font-semibold">{project.name}</h3>
                     </div>
-                )
-            )}
+
+                    <button
+                        onClick={() => onDelete(project.id)} // ✅ string
+                        className="text-red-500 hover:text-red-700"
+                    >
+                        Delete
+                    </button>
+                </div>
+            ))}
         </div>
     );
 }

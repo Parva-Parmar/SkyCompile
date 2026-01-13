@@ -1,31 +1,62 @@
-const projects = [
-    { id: 1, name: "Compiler" },
-    { id: 2, name: "Chat App" },
-    { id: 3, name: "AI Tool" },
-];
+import { useEffect, useState } from "react";
+import {
+    getProjects,
+    createProject,
+    deleteProject,
+} from "../../api/projects";
+import type { Project } from "../../api/projects";
+
+import ProjectCards from "./ProjectCards";
 
 export default function ProjectsSection() {
+    const [projects, setProjects] = useState<Project[]>([]);
+    const [newProject, setNewProject] = useState("");
+
+    const loadProjects = async () => {
+        const data = await getProjects();
+        setProjects(data);
+    };
+
+    useEffect(() => {
+        loadProjects();
+    }, []);
+
+    const handleCreate = async () => {
+        if (!newProject.trim()) return;
+        await createProject(newProject);
+        setNewProject("");
+        loadProjects();
+    };
+
+    const handleDelete = async (id: string) => {
+        await deleteProject(id);
+        loadProjects();
+    };
+
     return (
-        <>
-            <div className="flex justify-between mb-6">
-                <h2 className="text-xl font-semibold">Projects</h2>
-                <button className="bg-indigo-500 text-white px-4 py-2 rounded">
-                    + Add Project
+        <div className="space-y-6">
+            {/* Create Project */}
+            <div className="flex gap-3">
+                <input
+                    value={newProject}
+                    onChange={(e) => setNewProject(e.target.value)}
+                    placeholder="New project name"
+                    className="flex-1 border rounded px-3 py-2"
+                />
+                <button
+                    onClick={() => {
+                        console.log("ADD PROJECT CLICKED");
+                        handleCreate();
+                    }}
+                    className="bg-indigo-500 text-white px-4 py-2 rounded"
+                >
+                    Add Project
                 </button>
+
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {projects.map((project, index) => (
-                    <div key={project.id} className="bg-white p-5 rounded shadow">
-                        <p className="text-sm text-gray-500">Project #{index + 1}</p>
-                        <h3 className="text-lg font-semibold">{project.name}</h3>
-
-                        <button className="mt-4 text-sm text-red-500 hover:underline">
-                            Delete Project
-                        </button>
-                    </div>
-                ))}
-            </div>
-        </>
+            {/* Project List */}
+            <ProjectCards projects={projects} onDelete={handleDelete} />
+        </div>
     );
 }

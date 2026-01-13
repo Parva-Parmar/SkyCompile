@@ -4,11 +4,14 @@ import {
   deleteProjectById,
 } from "../models/project.model";
 
-export const fetchProjects = (userId: string) =>
-  getProjectsByUser(userId);
+export const fetchProjects = (userId: string) => {
+  return getProjectsByUser(userId);
+};
 
-export const addProject = (userId: string, name: string) =>
-  insertProject(userId, name);
+export const addProject = async (userId: string, name: string) => {
+  return insertProject(userId, name);
+};
 
-export const removeProject = (userId: string, projectId: number) =>
-  deleteProjectById(userId, projectId);
+export const removeProject = (userId: string, projectId: string) => {
+  return deleteProjectById(userId, projectId);
+};

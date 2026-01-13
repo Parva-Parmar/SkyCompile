@@ -11,3 +11,8 @@ export const pool = new Pool({
   password: process.env.DB_PASSWORD, // now guaranteed string
   database: process.env.DB_NAME,
 });
+console.log("CONNECTED TO DB:", {
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  user: process.env.DB_USER,
+});
