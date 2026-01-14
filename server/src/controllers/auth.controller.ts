@@ -14,7 +14,7 @@ export const signupController = async (req: Request, res: Response) => {
 export const signinController = async (req: Request, res: Response) => {
     try{
         const { token, user } = await signinService(req.body);
-        console.log("Generated Token:", token);
+        // console.log("Generated Token:", token);
         res.status(200).json({
             token,
             user,

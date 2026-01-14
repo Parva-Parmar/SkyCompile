@@ -5,7 +5,9 @@ import FileExplorer from "../components/workspace/FileExplorer";
 import MonacoEditor from "../components/workspace/MonacoEditor";
 import TerminalPanel from "../components/workspace/TerminalPanel";
 import EditorTabs from "../components/workspace/EditorTabs";
-
+import TerminalTabs from "../components/workspace/TerminalTabs";
+import { socket } from "../socket";
+import { useNavigate } from "react-router-dom";
 
 import {
     getFileTree,
@@ -31,7 +33,8 @@ export default function ProjectWorkspace() {
     const [code, setCode] = useState<string>("");
     const [savedContent, setSavedContent] = useState<Record<string, string>>({});
     const [buffers, setBuffers] = useState<Record<string, string>>({});
-
+    const [terminals, setTerminals] = useState<string[]>([]);
+    const [activeTerminal, setActiveTerminal] = useState<string | null>(null);
 
     // Load file tree
     const loadTree = async () => {
@@ -173,12 +176,60 @@ export default function ProjectWorkspace() {
         setActiveFile(path);
         setCode(buffers[path] ?? "");
     };
+    const createTerminal = () => {
+        const id = crypto.randomUUID();
+        setTerminals((prev) => [...prev, id]);
+        setActiveTerminal(id);
+    };
+    useEffect(() => {
+        if (terminals.length === 0) {
+            createTerminal();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
+    const closeTerminal = (id: string) => {
+        socket.emit("terminal:close", { terminalId: id });
+
+        setTerminals((prev) => prev.filter((t) => t !== id));
+
+        if (activeTerminal === id) {
+            setActiveTerminal((prev) =>
+                prev === id ? null : prev
+            );
+        }
+    };
+    useEffect(() => {
+        socket.on("files:changed", loadTree);
+
+        return () => {
+            socket.off("files:changed", loadTree);
+        };
+    }, [projectId]);
+    const navigate = useNavigate();
+
+    const exitWorkspace = () => {
+        navigate("/dashboard");
+    };
 
 
 
     return (
         <WorkspaceLayout
+            header={
+                <div className="flex items-center gap-3 px-4">
+                    <button
+                        onClick={exitWorkspace}
+                        className="text-sm text-gray-300 hover:text-white flex items-center gap-1"
+                    >
+                        ← Back to Projects
+                    </button>
+
+                    <span className="text-xs text-gray-500">
+                        Project Workspace
+                    </span>
+                </div>
+            }
             sidebar={
                 <FileExplorer
                     tree={tree}
@@ -212,7 +263,71 @@ export default function ProjectWorkspace() {
                 </div>
             }
 
-            terminal={<TerminalPanel />}
+            terminal={
+                <div className="h-full flex flex-col">
+
+                    {/* Terminal Toolbar */}
+                    <div className="flex items-center justify-end gap-3 px-3 py-1 border-b border-[#2a2a2a] bg-[#1e1e1e] text-sm">
+                        <button
+                            disabled={!activeTerminal}
+                            onClick={() => {
+                                if (!activeTerminal) return;
+                                socket.emit("terminal:input", {
+                                    terminalId: activeTerminal,
+                                    input: "clear\n",
+                                });
+                            }}
+                            className="text-gray-300 hover:text-white disabled:opacity-40"
+                        >
+                            Clear
+                        </button>
+
+                        <button
+                            disabled={!activeTerminal}
+                            onClick={() => {
+                                if (!activeTerminal) return;
+                                socket.emit("terminal:input", {
+                                    terminalId: activeTerminal,
+                                    input: "exit\n",
+                                });
+                            }}
+                            className="text-red-400 hover:text-red-300 disabled:opacity-40"
+                        >
+                            Exit
+                        </button>
+                    </div>
+                    {/* Terminal Tabs */}
+                    <TerminalTabs
+                        terminals={terminals}
+                        activeTerminal={activeTerminal}
+                        onSelect={setActiveTerminal}
+                        onClose={closeTerminal}
+                        onCreate={createTerminal}
+                    />
+
+                    {/* Active Terminal */}
+                    <div className="flex-1 relative overflow-hidden">
+                        {terminals.map((id) => (
+                            <div
+                                key={id}
+                                className={`absolute inset-0 ${activeTerminal === id ? "block" : "hidden"
+                                    }`}
+                            >
+                                <TerminalPanel
+                                    projectId={projectId!}
+                                    userId={JSON.parse(
+                                        atob(localStorage.getItem("token")!.split(".")[1])
+                                    ).userId}
+                                    terminalId={id}
+                                />
+                            </div>
+                        ))}
+                    </div>
+
+                </div>
+            }
+
+
         />
     );
 }

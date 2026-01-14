@@ -13,10 +13,10 @@ export const authMiddleware = (
   res: Response,
   next: NextFunction
 ) => {
-  console.log("AUTH MIDDLEWARE HIT"); // 👈 ADD THIS
+  // console.log("AUTH MIDDLEWARE HIT"); // 👈 ADD THIS
 
   const authHeader = req.headers.authorization;
-  console.log("AUTH HEADER:", authHeader); // 👈 ADD THIS
+  // console.log("AUTH HEADER:", authHeader); // 👈 ADD THIS
    
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({ message: "Authorization header missing" });

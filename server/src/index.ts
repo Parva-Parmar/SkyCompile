@@ -6,7 +6,11 @@ import userRoutes from "./routes/user.route";
 import projectRoutes from "./routes/project.route";
 import friendRoutes from "./routes/friend.route";
 import filesRoutes from "./routes/files.route";
-
+import http from "http";
+import { Server } from "socket.io";
+import { setupTerminal } from "./terminal/terminal.manager";
+import chokidar from "chokidar";
+import path from "path";
 
 const app = express();
 
@@ -32,7 +36,35 @@ app.use("/api/v1/projects", projectRoutes);
 app.use("/api/v1/friends", friendRoutes);
 app.use("/api/v1", filesRoutes);
 
+const PROJECTS_ROOT = path.resolve(
+  __dirname,
+  "../skycompiler_projects"
+);
 const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173",
+  },
 });
+
+setupTerminal(io);
+const watcher = chokidar.watch(PROJECTS_ROOT, {
+  ignoreInitial: true,
+  persistent: true,
+});
+
+watcher.on("all", (event: string, filePath: string) => {
+  const relativePath = path.relative(PROJECTS_ROOT, filePath);
+
+  io.emit("files:changed", {
+    event,
+    path: relativePath,
+  });
+});
+server.listen(PORT, () => {
+  console.log(`🚀 Server + Terminal running on http://localhost:${PORT}`);
+});
+

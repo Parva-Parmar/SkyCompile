@@ -1,82 +1,89 @@
-import { useState } from "react";
-import { v4 as uuid } from "uuid";
-import type { TerminalTab } from "../../types/terminal";
+import { useEffect, useRef } from "react";
+import { Terminal } from "@xterm/xterm";
+import "@xterm/xterm/css/xterm.css";
+import { socket } from "../../socket";
 
-export default function TerminalPanel() {
-    const [tabs, setTabs] = useState<TerminalTab[]>([
-        { id: uuid(), title: "Terminal 1" },
-    ]);
-    const [active, setActive] = useState<string>(tabs[0].id);
+export default function TerminalPanel({
+    projectId,
+    userId,
+    terminalId,
+}: {
+    projectId: string;
+    userId: string;
+    terminalId: string;
+}) {
+    const ref = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        if (!ref.current) return;
 
-    // ✅ Create new terminal
-    const addTerminal = () => {
-        const newTab = {
-            id: uuid(),
-            title: `Terminal ${tabs.length + 1}`,
-        };
-        setTabs((prev) => [...prev, newTab]);
-        setActive(newTab.id);
-    };
+        const resizeObserver = new ResizeObserver(() => {
+            const cols = Math.floor(ref.current!.clientWidth / 8);
+            const rows = Math.floor(ref.current!.clientHeight / 18);
 
-    // ✅ Delete terminal
-    const removeTerminal = (id: string) => {
-        setTabs((prev) => {
-            // 🚨 prevent removing last terminal (VS Code behavior)
-            if (prev.length === 1) return prev;
-
-            const updated = prev.filter((t) => t.id !== id);
-
-            // if active tab was removed, switch to another
-            if (id === active) {
-                setActive(updated[updated.length - 1].id);
-            }
-
-            return updated;
+            socket.emit("terminal:resize", {
+                terminalId,
+                cols,
+                rows,
+            });
         });
-    };
 
-    return (
-        <div className="h-full bg-[#1e1e1e] text-sm text-white">
-            {/* Tabs bar */}
-            <div className="flex items-center border-b border-[#2a2a2a]">
-                {tabs.map((tab) => (
-                    <div
-                        key={tab.id}
-                        onClick={() => setActive(tab.id)}
-                        className={`flex items-center gap-2 px-3 py-1 cursor-pointer
-              ${tab.id === active ? "bg-[#252526]" : ""}
-            `}
-                    >
-                        <span>{tab.title}</span>
+        resizeObserver.observe(ref.current);
 
-                        {/* ❌ Close button */}
-                        <button
-                            onClick={(e) => {
-                                e.stopPropagation(); // 🚨 important
-                                removeTerminal(tab.id);
-                            }}
-                            className="text-gray-400 hover:text-white"
-                        >
-                            ×
-                        </button>
-                    </div>
-                ))}
+        return () => resizeObserver.disconnect();
+    }, [terminalId]);
 
-                {/* ➕ Add terminal */}
-                <button
-                    onClick={addTerminal}
-                    className="ml-auto px-3 text-gray-400 hover:text-white"
-                >
-                    +
-                </button>
-            </div>
+    useEffect(() => {
+        if (!ref.current || !terminalId) return;
 
-            {/* Terminal content */}
-            <div className="p-2">
-                <div className="h-40 bg-black text-green-400 p-2">
-                    Terminal Output ({active})
-                </div>
-            </div>
-        </div>
-    );
+        const term = new Terminal({
+            cursorBlink: true,
+            fontSize: 14,
+            theme: {
+                background: "#1e1e1e",
+                foreground: "#d4d4d4",
+            },
+        });
+
+        term.open(ref.current);
+        term.focus();
+
+        socket.emit("terminal:start", {
+            projectId,
+            userId,
+            terminalId,
+        });
+
+        const onData = ({
+            terminalId: id,
+            data,
+        }: {
+            terminalId: string;
+            data: string;
+        }) => {
+            if (id === terminalId) {
+                term.write(data);
+            }
+        };
+
+        socket.on("terminal:data", ({ terminalId: id, data }) => {
+            if (id === terminalId) {
+                term.write(data);
+            }
+        });
+
+
+        term.onData((input) => {
+            socket.emit("terminal:input", {
+                terminalId,
+                input,
+            });
+        });
+
+        return () => {
+            socket.off("terminal:data", onData);
+            term.dispose();
+        };
+    }, [projectId, userId, terminalId]);
+
+    return <div ref={ref} className="h-full w-full" />;
 }
