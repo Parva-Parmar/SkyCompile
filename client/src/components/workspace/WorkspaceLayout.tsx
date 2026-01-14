@@ -9,12 +9,12 @@ export default function WorkspaceLayout({
 }) {
     return (
         <div className="h-screen flex flex-col bg-[#1e1e1e] text-white">
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1 overflow-hidden flex h-full">
                 <aside className="w-64 border-r border-[#2a2a2a]">
                     {sidebar}
                 </aside>
 
-                <main className="flex-1 flex flex-col">
+                <main className="flex-1 flex flex-col overflow-hidden">
                     {editor}
                 </main>
             </div>

@@ -5,6 +5,8 @@ import authRoutes from "./routes/auth.route";
 import userRoutes from "./routes/user.route";
 import projectRoutes from "./routes/project.route";
 import friendRoutes from "./routes/friend.route";
+import filesRoutes from "./routes/files.route";
+
 
 const app = express();
 
@@ -28,6 +30,7 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/projects", projectRoutes);
 app.use("/api/v1/friends", friendRoutes);
+app.use("/api/v1", filesRoutes);
 
 const PORT = 3000;
 app.listen(PORT, () => {

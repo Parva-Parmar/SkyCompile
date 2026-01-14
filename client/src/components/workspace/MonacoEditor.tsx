@@ -8,18 +8,13 @@ export default function MonacoEditor({
     onChange: (v: string) => void;
 }) {
     return (
-        <Editor
-            height="100%"
-            theme="vs-dark"
-            language="typescript"
-            value={value}
-            onChange={(v) => onChange(v || "")}
-            options={{
-                fontSize: 14,
-                minimap: { enabled: true },
-                wordWrap: "on",
-                automaticLayout: true,
-            }}
-        />
+        <div className="h-full w-full">
+            <Editor
+                height="100%"
+                theme="vs-dark"
+                value={value}
+                onChange={(v) => onChange(v || "")}
+            />
+        </div>
     );
 }

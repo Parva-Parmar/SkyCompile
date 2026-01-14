@@ -1,17 +1,20 @@
 import FileNodeView from "./FileNode";
 import type { FileNode } from "../../types/file";
 
-
 export default function FileExplorer({
     tree,
     onSelect,
     onCreateFile,
     onCreateFolder,
+    onDelete,
+    onRename,
 }: {
     tree: FileNode[];
     onSelect: (path: string) => void;
     onCreateFile: () => void;
     onCreateFolder: () => void;
+    onDelete: (path: string) => void;
+    onRename: (oldPath: string, newPath: string) => void;
 }) {
     return (
         <div className="h-full p-2 text-sm">
@@ -29,6 +32,8 @@ export default function FileExplorer({
                     node={node}
                     path=""
                     onSelect={onSelect}
+                    onDelete={onDelete}
+                    onRename={onRename}
                 />
             ))}
         </div>
