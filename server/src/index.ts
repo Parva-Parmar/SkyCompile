@@ -58,6 +58,10 @@ const watcher = chokidar.watch(PROJECTS_ROOT, {
 
 watcher.on("all", (event: string, filePath: string) => {
   const relativePath = path.relative(PROJECTS_ROOT, filePath);
+console.log("[FS_EVENT]", {
+  event,
+  path: relativePath,
+});
 
   io.emit("files:changed", {
     event,

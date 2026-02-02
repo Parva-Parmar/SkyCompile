@@ -8,10 +8,7 @@ import { buildFileTree } from "../utils/fileTree";
  * GET /projects/:projectId/files
  * Returns file tree for a project
  */
-export async function getProjectFiles(
-  req: Request,
-  res: Response
-) {
+export async function getProjectFiles(req: Request, res: Response) {
   const { projectId } = req.params;
   const userId = req.user.id;
 
@@ -25,10 +22,7 @@ export async function getProjectFiles(
  * GET /projects/:projectId/files/content?path=/src/index.ts
  * Returns file content
  */
-export async function getFileContent(
-  req: Request,
-  res: Response
-) {
+export async function getFileContent(req: Request, res: Response) {
   const { projectId } = req.params;
   const { path: filePath } = req.query as { path: string };
   const userId = req.user.id;
@@ -48,10 +42,7 @@ export async function getFileContent(
  * PUT /projects/:projectId/files/content
  * Body: { path: string, content: string }
  */
-export async function saveFileContent(
-  req: Request,
-  res: Response
-) {
+export async function saveFileContent(req: Request, res: Response) {
   const { projectId } = req.params;
   const { path: filePath, content } = req.body;
   const userId = req.user.id;
@@ -62,8 +53,18 @@ export async function saveFileContent(
   if (!resolvedPath.startsWith(projectRoot)) {
     return res.status(403).json({ error: "Access denied" });
   }
-
+  console.log("[FILES_WRITE_START]", {
+    userId,
+    projectId,
+    path: filePath,
+  });
   await fs.writeFile(resolvedPath, content, "utf-8");
+  console.log("[FILES_WRITE_END]", {
+    userId,
+    projectId,
+    path: filePath,
+    bytes: content.length,
+  });
   return res.json({ success: true });
 }
 
@@ -71,10 +72,7 @@ export async function saveFileContent(
  * POST /projects/:projectId/files
  * Body: { path: string }
  */
-export async function createFile(
-  req: Request,
-  res: Response
-) {
+export async function createFile(req: Request, res: Response) {
   const { projectId } = req.params;
   const { path: filePath } = req.body;
   const userId = req.user.id;
@@ -85,8 +83,20 @@ export async function createFile(
   if (!resolvedPath.startsWith(projectRoot)) {
     return res.status(403).json({ error: "Access denied" });
   }
+  console.log("[FILES_CREATE]", {
+    userId,
+    projectId,
+    path: filePath,
+  });
 
   await fs.writeFile(resolvedPath, "", "utf-8");
+
+  console.log("[FILES_CREATE]", {
+    userId,
+    projectId,
+    path: filePath,
+  });
+
   return res.json({ success: true });
 }
 
@@ -94,10 +104,7 @@ export async function createFile(
  * POST /projects/:projectId/folders
  * Body: { path: string }
  */
-export async function createFolder(
-  req: Request,
-  res: Response
-) {
+export async function createFolder(req: Request, res: Response) {
   const { projectId } = req.params;
   const { path: folderPath } = req.body;
   const userId = req.user.id;
@@ -113,15 +120,11 @@ export async function createFolder(
   return res.json({ success: true });
 }
 
-
 /**
  * DELETE /projects/:projectId/files
  * Body: { path: string }
  */
-export async function deleteEntry(
-  req: Request,
-  res: Response
-) {
+export async function deleteEntry(req: Request, res: Response) {
   const { projectId } = req.params;
   const { path: targetPath } = req.body;
   const userId = req.user.id;
@@ -133,7 +136,21 @@ export async function deleteEntry(
     return res.status(403).json({ error: "Access denied" });
   }
 
+  console.log("[FILES_DELETE]", {
+    userId,
+    projectId,
+    path: targetPath,
+    type: stat.isDirectory() ? "directory" : "file",
+  });
+
   const stat = await fs.stat(resolvedPath);
+
+  console.log("[FILES_DELETE]", {
+    userId,
+    projectId,
+    path: targetPath,
+    type: stat.isDirectory() ? "directory" : "file",
+  });
 
   if (stat.isDirectory()) {
     await fs.rm(resolvedPath, { recursive: true, force: true });
@@ -148,10 +165,7 @@ export async function deleteEntry(
  * PUT /projects/:projectId/files/rename
  * Body: { oldPath: string, newPath: string }
  */
-export async function renameEntry(
-  req: Request,
-  res: Response
-) {
+export async function renameEntry(req: Request, res: Response) {
   const { projectId } = req.params;
   const { oldPath, newPath } = req.body;
   const userId = req.user.id;

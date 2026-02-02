@@ -19,7 +19,9 @@
 ### GET `/api/v1/landing`
 
 **Auth:** ❌  
+
 **Description:** Backend connectivity & health check.
+
 **Response**
 
 ```json
@@ -35,7 +37,9 @@
 ### POST `/api/v1/auth/signup`
 
 **Auth:** ❌  
+
 **Description:** Register a new user.
+
 **middleware** signupValidator
 
 **Request**
@@ -60,7 +64,9 @@
 ### POST `/api/v1/auth/signin`
 
 **Auth:** ❌  
+
 **Description:** Authenticate user and issue JWT.
+
 **middleware** signinValidator
 
 **Request**
@@ -86,7 +92,9 @@
 ### GET `/api/v1/users/me`
 
 **Auth:** ✅
+
 **Description:** Get the currently authenticated user profile
+
 **Headers** `Authorization: Bearer <jwt>`
 
 **Response**
@@ -104,8 +112,11 @@
 ### GET `/api/v1/projects`
 
 **Auth:** ✅
+
 **Description:** List all projects owned by the authenticated user.
+
 **Headers** `Authorization: Bearer <jwt>`
+
 **Response**
 
 ```json
@@ -121,7 +132,9 @@
 ### POST `/api/v1/projects`
 
 **Auth:** ✅
+
 **Description:** Create a new project.
+
 **Request**
 
 ```json
@@ -143,11 +156,14 @@
 ### DELETE `/api/v1/projects/:id`
 
 **Auth:** ✅
+
 **Description:** : Delete a project by ID.
+
 **Path Params** :
 | Name | Type |
 | ---- | ------ |
 | id | string |
+
 **Response**
 
 ```json
@@ -161,7 +177,9 @@
 ### POST `/api/v1/friends/request`
 
 **Auth:** ✅
+
 **Description:**: Send a friend request using email.
+
 **Request**
 
 ```json
@@ -173,6 +191,7 @@
 ### GET `/api/v1/friends/requests`
 
 **Auth:** ✅
+
 **Description:**: List incoming friend requests.
 
 ```json
