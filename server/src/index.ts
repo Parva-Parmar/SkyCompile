@@ -16,9 +16,10 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
   })
 );
+
 
 app.use(express.json());
 
@@ -64,7 +65,8 @@ watcher.on("all", (event: string, filePath: string) => {
     path: relativePath,
   });
 });
-server.listen(PORT, () => {
+server.listen(PORT, "0.0.0.0", () => {
   console.log(`🚀 Server + Terminal running on http://localhost:${PORT}`);
 });
+
 
