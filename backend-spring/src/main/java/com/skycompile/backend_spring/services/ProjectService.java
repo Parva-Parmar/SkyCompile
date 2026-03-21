@@ -18,7 +18,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.ArrayList;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class ProjectService {
 
@@ -56,6 +58,8 @@ public class ProjectService {
         member.setRole(ProjectRole.OWNER);
         projectMemberRepository.save(member);
 
+        log.info("[AUDIT] User {} created project '{}' ({})", user.getId(), name, savedProject.getId());
+
         return savedProject;
     }
 
@@ -91,6 +95,7 @@ public class ProjectService {
         }
         
         if (isOwner) {
+            log.info("[AUDIT] User {} deleted project {}", user.getId(), projectId);
             projectRepository.delete(project);
         } else {
             throw new RuntimeException("Unauthorized to delete this project");
@@ -124,6 +129,8 @@ public class ProjectService {
         newMember.setProject(project);
         newMember.setUser(userToAdd);
         newMember.setRole(role);
+        
+        log.info("[AUDIT] User {} added user {} to project {} with role {}", currentUser.getId(), userToAdd.getId(), projectId, role);
         return projectMemberRepository.save(newMember);
     }
 
@@ -145,7 +152,10 @@ public class ProjectService {
                 .orElseThrow(() -> new RuntimeException("User to remove not found"));
                 
         Optional<ProjectMember> existingMember = projectMemberRepository.findByProjectAndUser(project, userToRemove);
-        existingMember.ifPresent(projectMemberRepository::delete);
+        existingMember.ifPresent(m -> {
+            log.info("[AUDIT] User {} removed user {} from project {}", currentUser.getId(), userToRemove.getId(), projectId);
+            projectMemberRepository.delete(m);
+        });
     }
     
     public List<ProjectMember> getProjectMembers(UUID projectId) {

@@ -1,4 +1,3 @@
-version: '3.8'
 
 services:
   db:
@@ -41,14 +40,6 @@ services:
     volumes:
       - ./skycompiler_projects:/app/skycompiler_projects
 
-  server:
-    build: ./server
-    container_name: skycompile-node
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./skycompiler_projects:/app/skycompiler_projects
-
   client:
     build: ./client
     container_name: skycompile-client
@@ -58,7 +49,6 @@ services:
       - VITE_USE_SPRING_BOOT=true
     depends_on:
       - backend-spring
-      - server
       - backend-go
 
 volumes:

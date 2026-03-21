@@ -14,6 +14,7 @@ func main() {
 	})
 
 	http.HandleFunc("/terminal", serveTerminalWs)
+	http.HandleFunc("/api/v1/projects/", AuthMiddleware(handleFileApi))
 
 	log.Println("SkyCompile Real-Time Collaboration Server starting on :8082")
 	err := http.ListenAndServe(":8082", nil)
