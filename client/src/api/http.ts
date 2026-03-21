@@ -1,4 +1,8 @@
-const API_BASE_URL = "http://localhost:3000/api/v1";
+const USE_SPRING_BOOT = import.meta.env.VITE_USE_SPRING_BOOT === 'true';
+const SPRING_BOOT_URL = "http://localhost:8081/api";
+const NODE_URL = "http://localhost:3000/api/v1";
+
+const API_BASE_URL = USE_SPRING_BOOT ? SPRING_BOOT_URL : NODE_URL;
 
 const getToken = () => localStorage.getItem("token");
 
