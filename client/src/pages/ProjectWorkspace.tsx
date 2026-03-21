@@ -254,7 +254,17 @@ export default function ProjectWorkspace() {
 
                     </div>
 
-                    <div className="flex-1 overflow-hidden">
+                    <div className="flex-1 overflow-hidden relative">
+                        {import.meta.env.VITE_COLLAB_ENABLED === 'true' ? (
+                            <div className="absolute inset-0 z-50 flex items-center justify-center bg-[#1e1e1e] text-orange-400 bg-opacity-90 flex-col gap-2">
+                                <span className="animate-pulse font-bold text-lg">⚠️ Collaborative Editor Mode ⚠️</span>
+                                <span className="text-xs text-gray-400 max-w-sm text-center">
+                                    Real-time Yjs syncing is currently behind a feature flag for stability rollout testing. 
+                                    Please set VITE_COLLAB_ENABLED=false in your .env to fallback to the stable HTTP REST pipeline.
+                                </span>
+                            </div>
+                        ) : null}
+
                         <MonacoEditor
                             value={code}
                             onChange={onCodeChange}
