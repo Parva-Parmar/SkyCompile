@@ -38,12 +38,16 @@ services:
     container_name: skycompile-go
     ports:
       - "8082:8082"
+    volumes:
+      - ./skycompiler_projects:/app/skycompiler_projects
 
   server:
     build: ./server
     container_name: skycompile-node
     ports:
       - "3000:3000"
+    volumes:
+      - ./skycompiler_projects:/app/skycompiler_projects
 
   client:
     build: ./client
