@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: skycompile-db
+    environment:
+      POSTGRES_USER: spring_user
+      POSTGRES_PASSWORD: spring_password
+      POSTGRES_DB: skycompile_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U spring_user -d skycompile_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend-spring:
+    build: ./backend-spring
+    container_name: skycompile-spring
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/skycompile_db
+      - SPRING_DATASOURCE_USERNAME=spring_user
+      - SPRING_DATASOURCE_PASSWORD=spring_password
+      # Auto-generate tables on startup in the fresh Docker database
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update 
+    depends_on:
+      db:
+        condition: service_healthy
+
+  backend-go:
+    build: ./backend-go
+    container_name: skycompile-go
+    ports:
+      - "8082:8082"
+
+  server:
+    build: ./server
+    container_name: skycompile-node
+    ports:
+      - "3000:3000"
+
+  client:
+    build: ./client
+    container_name: skycompile-client
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_USE_SPRING_BOOT=true
+    depends_on:
+      - backend-spring
+      - server
+      - backend-go
+
+volumes:
+  pgdata:
