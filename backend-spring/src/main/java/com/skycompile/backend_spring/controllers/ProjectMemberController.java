@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/projects/{projectId}/members")
-@CrossOrigin(origins = "*", maxAge = 3600)
+@RequestMapping("/api/v1/projects/{projectId}/members")
+
 public class ProjectMemberController {
 
     private final ProjectService projectService;

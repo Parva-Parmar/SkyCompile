@@ -29,4 +29,8 @@ public class User {
 
     @Column(name = "created_at",updatable = false)
     private LocalDateTime createdAt;
+    
+    public User() {
+        System.out.println("DEBUG: User() constructor called - firstname='" + this.firstname + "', lastname='" + this.lastname + "'");
+    }
 }

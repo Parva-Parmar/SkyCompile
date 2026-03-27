@@ -2,7 +2,8 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# Install dependencies
+# Install curl for health checks and dependencies
+RUN apk add --no-cache curl
 COPY package*.json ./
 RUN npm install
 

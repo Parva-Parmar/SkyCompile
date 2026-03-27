@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import EmailAutocompleteInput from "../workspace/EmailAutocompleteInput";
 import {
     getFriends,
     getFriendRequests,
@@ -16,6 +17,9 @@ export default function FriendsSection() {
     const [requests, setRequests] = useState<FriendRequest[]>([]);
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
+
+    // Get existing friends and their emails to exclude from suggestions
+    const existingEmails = [...friends.map(f => f.email), ...requests.map(r => r.email)];
 
     /* =========================
        Load data
@@ -82,18 +86,19 @@ export default function FriendsSection() {
             <div className="bg-white rounded-lg p-6 shadow">
                 <h2 className="text-lg font-semibold mb-4">Add Friend</h2>
                 <div className="flex gap-3">
-                    <input
+                    <EmailAutocompleteInput
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Friend's email"
-                        className="flex-1 border rounded px-3 py-2"
+                        onChange={setEmail}
+                        placeholder="Start typing to search users..."
+                        disabled={loading}
+                        excludeEmails={existingEmails}
                     />
                     <button
                         onClick={handleSendRequest}
-                        disabled={loading}
-                        className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600"
+                        disabled={loading || !email.trim()}
+                        className="bg-indigo-500 text-white px-4 py-2 rounded hover:bg-indigo-600 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        Send
+                        {loading ? "Sending..." : "Send"}
                     </button>
                 </div>
             </div>

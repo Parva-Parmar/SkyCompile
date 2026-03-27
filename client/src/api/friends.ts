@@ -32,7 +32,7 @@ export interface FriendRequest {
  * POST /api/v1/friends/request
  */
 export const sendFriendRequest = async (email: string) => {
-  return postAuthRequest("/friends/request", { email });
+  return postAuthRequest("/friends/request", { addresseeEmail: email });
 };
 
 /**

@@ -1,0 +1,93 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: skycompile-db-prod
+    environment:
+      POSTGRES_USER: parva
+      POSTGRES_PASSWORD: parva123
+      POSTGRES_DB: collaborative_compiler
+    volumes:
+      - skycompiler_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U parva -d collaborative_compiler"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - skycompile-network
+
+  backend-spring:
+    build: ./backend-spring
+    container_name: skycompile-spring-prod
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/collaborative_compiler
+      - SPRING_DATASOURCE_USERNAME=parva
+      - SPRING_DATASOURCE_PASSWORD=parva123
+      - JWT_SECRET=super_secret_dev_key_123_upgraded_to_256_bits_for_skycompile!
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - skycompile-network
+
+  backend-go:
+    build: ./backend-go
+    container_name: skycompile-go-prod
+    environment:
+      - JWT_SECRET=super_secret_dev_key_123_upgraded_to_256_bits_for_skycompile!
+    volumes:
+      - skycompiler_projects:/app/skycompiler_projects
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - skycompile-network
+
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.prod
+    container_name: skycompile-client-prod
+    ports:
+      - "80:80"
+    depends_on:
+      backend-spring:
+        condition: service_healthy
+      backend-go:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - skycompile-network
+
+volumes:
+  skycompiler_db_data:
+    driver: local
+  skycompiler_projects:
+    driver: local
+
+networks:
+  skycompile-network:
+    driver: bridge

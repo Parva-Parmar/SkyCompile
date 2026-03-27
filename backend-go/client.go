@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -84,16 +85,12 @@ func (c *Client) writePump() {
 }
 
 func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request) {
-	projectId := r.URL.Query().Get("projectId")
-	path := r.URL.Query().Get("path")
-
-	if projectId == "" || path == "" {
-		http.Error(w, "projectId and path are required", http.StatusBadRequest)
+	// Extract roomName directly appended by y-websocket as /ws/RoomID
+	roomID := strings.TrimPrefix(r.URL.Path, "/ws/")
+	if roomID == "" {
+		http.Error(w, "invalid room ID", http.StatusBadRequest)
 		return
 	}
-
-	// Uniquely identify the document space
-	roomID := projectId + "_" + path
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {

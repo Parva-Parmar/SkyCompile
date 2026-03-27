@@ -27,6 +27,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        final String requestPath = request.getRequestURI();
+        
+        // Skip JWT processing for auth endpoints
+        if (requestPath.startsWith("/api/auth/") || requestPath.startsWith("/api/v1/auth/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String userEmail;
@@ -39,6 +47,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7);
         try {
             userEmail = jwtUtils.extractEmail(jwt);
+            System.out.println("DEBUG: JWT Filter - Extracted email: '" + userEmail + "'");
         } catch (Exception e) {
             filterChain.doFilter(request, response);
             return;

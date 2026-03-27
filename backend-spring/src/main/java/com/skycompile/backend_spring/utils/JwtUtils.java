@@ -21,6 +21,16 @@ public class JwtUtils {
         return extractClaim(token, Claims::getSubject);
     }
 
+    public String generateToken(String email, String userId) {
+        return Jwts.builder()
+                .setSubject(email)
+                .claim("userId", userId)
+                .setIssuedAt(new java.util.Date(System.currentTimeMillis()))
+                .setExpiration(new java.util.Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24)) // 24 hours
+                .signWith(getSigningKey(), io.jsonwebtoken.SignatureAlgorithm.HS256)
+                .compact();
+    }
+
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())

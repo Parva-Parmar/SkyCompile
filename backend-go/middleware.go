@@ -82,7 +82,7 @@ func AuthMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		tokenString := strings.Split(authHeader, " ")[1]
 		secret := os.Getenv("JWT_SECRET")
 		if secret == "" {
-			secret = "super_secret_jwt_key_for_collaborative_compiler" // fallback if undefined in container
+			secret = "super_secret_dev_key_123_upgraded_to_256_bits_for_skycompile!" // fallback if undefined in container
 		}
 
 		token, err := jwt.Parse(tokenString, func(t *jwt.Token) (interface{}, error) {

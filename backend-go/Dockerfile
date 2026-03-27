@@ -7,11 +7,12 @@ COPY . .
 RUN go mod tidy
 
 # Build the Go app
-RUN go build -o main .
+RUN go build -o skycompile-go .
 
 # Run stage
 FROM alpine:latest
+RUN apk add --no-cache bash curl
 WORKDIR /app
-COPY --from=builder /app/main .
+COPY --from=builder /app/skycompile-go .
 EXPOSE 8082
-CMD ["./main"]
+CMD ["./skycompile-go"]

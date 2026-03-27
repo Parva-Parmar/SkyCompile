@@ -16,7 +16,7 @@ export default function DashboardNavbar() {
 
                 {/* LEFT */}
                 <div className="text-md font-medium text-gray-700">
-                    Welcome, {user?.firstname}
+                    Welcome, {user?.firstname || user?.name || 'User'}
                 </div>
 
                 {/* CENTER */}

@@ -10,11 +10,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @RestController
-@RequestMapping("/api/projects")
-@CrossOrigin(origins = "*", maxAge = 3600)
+@RequestMapping("/api/v1/projects")
+
 public class ProjectController {
 
     private final ProjectService projectService;
@@ -35,10 +37,29 @@ public class ProjectController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Project>> getUserProjects() {
+    public ResponseEntity<List<Map<String, Object>>> getUserProjects() {
         try {
             List<Project> projects = projectService.getUserProjects();
-            return new ResponseEntity<>(projects, HttpStatus.OK);
+            List<Map<String, Object>> mapped = projects.stream().map(p -> {
+                Map<String, Object> projectMap = new java.util.HashMap<>();
+                projectMap.put("id", p.getId());
+                projectMap.put("name", p.getName());
+                projectMap.put("created_at", p.getCreatedAt() != null ? p.getCreatedAt().toString() : "");
+                
+                // Add owner information
+                if (p.getOwner() != null) {
+                    Map<String, Object> ownerMap = new java.util.HashMap<>();
+                    ownerMap.put("id", p.getOwner().getId());
+                    ownerMap.put("firstname", p.getOwner().getFirstname());
+                    ownerMap.put("lastname", p.getOwner().getLastname());
+                    ownerMap.put("email", p.getOwner().getEmail());
+                    ownerMap.put("name", p.getOwner().getFirstname() + " " + p.getOwner().getLastname());
+                    projectMap.put("owner", ownerMap);
+                }
+                
+                return projectMap;
+            }).collect(Collectors.toList());
+            return new ResponseEntity<>(mapped, HttpStatus.OK);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

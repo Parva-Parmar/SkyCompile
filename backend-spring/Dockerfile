@@ -19,6 +19,8 @@ RUN ./mvnw package -DskipTests
 # Run stage
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
+# Install curl for health checks
+RUN apk add --no-cache curl
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8081
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -44,8 +44,8 @@ func getTerminalRoom(userId, projectId string) (*TerminalRoom, error) {
 		return room, nil
 	}
 
-	// Restrict executing space to the shared docker volume mirroring Node's getProjectRoot
-	cwd := filepath.Join("/app/skycompiler_projects", userId, projectId)
+	// Restrict executing space to the local projects directory
+	cwd := filepath.Join("/home/parva/projects/SkyCompile/skycompiler_projects", userId, projectId)
 	if err := os.MkdirAll(cwd, 0755); err != nil {
 		return nil, err
 	}

@@ -17,22 +17,36 @@ export default function ProjectCards({
                 <div
                     key={project.id}
                     onClick={() => onOpen(project.id)} // ✅ OPEN WORKSPACE
-                    className="border rounded p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50"
+                    className="border rounded p-4 flex flex-col justify-between cursor-pointer hover:bg-gray-50 transition-colors"
                 >
                     <div>
                         <p className="text-sm text-gray-500">#{index + 1}</p>
-                        <h3 className="font-semibold">{project.name}</h3>
+                        <h3 className="font-semibold text-lg">{project.name}</h3>
+                        
+                        {/* Owner Information */}
+                        {project.owner && (
+                            <div className="mt-2 text-sm text-gray-600">
+                                <p className="font-medium">Owner:</p>
+                                <p className="text-gray-500">{project.owner.name}</p>
+                                <p className="text-xs text-gray-400">{project.owner.email}</p>
+                            </div>
+                        )}
                     </div>
 
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation(); // 🚨 IMPORTANT
-                            onDelete(project.id);
-                        }}
-                        className="text-red-500 hover:text-red-700"
-                    >
-                        Delete
-                    </button>
+                    <div className="flex justify-between items-center mt-3 pt-3 border-t border-gray-200">
+                        <span className="text-xs text-gray-400">
+                            {project.created_at ? new Date(project.created_at).toLocaleDateString() : 'Unknown date'}
+                        </span>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation(); // 🚨 IMPORTANT
+                                onDelete(project.id);
+                            }}
+                            className="text-red-500 hover:text-red-700 text-sm font-medium"
+                        >
+                            Delete
+                        </button>
+                    </div>
                 </div>
             ))}
         </div>
