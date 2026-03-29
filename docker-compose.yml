@@ -45,6 +45,7 @@ services:
       - "5173:5173"
     environment:
       - VITE_USE_SPRING_BOOT=true
+      - VITE_COLLAB_ENABLED=true
     depends_on:
       backend-spring:
         condition: service_healthy

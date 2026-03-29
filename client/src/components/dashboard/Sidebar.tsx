@@ -5,14 +5,14 @@ interface SidebarProps {
 
 export default function Sidebar({ active, setActive }: SidebarProps) {
     const itemClass = (name: string) =>
-        `p-2 rounded cursor-pointer ${active === name
-            ? "bg-indigo-500 text-white"
-            : "text-gray-600 hover:bg-indigo-100"
+        `p-2 rounded cursor-pointer transition-colors ${active === name
+            ? "bg-[var(--accent)] text-white"
+            : "text-[var(--text-muted)] hover:bg-[var(--bg-elevated)]"
         }`;
 
     return (
-        <aside className="w-64 bg-white border-r min-h-screen p-4">
-            <h2 className="font-semibold text-gray-700 mb-4">Dashboard</h2>
+        <aside className="w-64 bg-[var(--sidebar-bg)] border-r border-[var(--border-color)] min-h-screen p-4">
+            <h2 className="font-semibold text-[var(--text-primary)] mb-4">Dashboard</h2>
 
             <ul className="space-y-2">
                 <li className={itemClass("profile")} onClick={() => setActive("profile")}>

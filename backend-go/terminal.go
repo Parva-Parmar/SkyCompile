@@ -45,14 +45,21 @@ func getTerminalRoom(userId, projectId string) (*TerminalRoom, error) {
 	}
 
 	// Restrict executing space to the local projects directory
-	cwd := filepath.Join("/home/parva/projects/SkyCompile/skycompiler_projects", userId, projectId)
+	// Verify directory exists
+	cwd := filepath.Join("/app/skycompiler_projects", projectId)
 	if err := os.MkdirAll(cwd, 0755); err != nil {
 		return nil, err
 	}
 
+	// Create a .bashrc to define the custom terminal prompt
+	bashrcPath := filepath.Join(cwd, ".bashrc")
+	if _, err := os.Stat(bashrcPath); os.IsNotExist(err) {
+		os.WriteFile(bashrcPath, []byte(`export PS1="\[\e[32m\]skycompile\[\e[m\]:\[\e[34m\]\w\[\e[m\]\$ "`+"\n"), 0644)
+	}
+
 	cmd := exec.Command("bash")
 	cmd.Dir = cwd
-	cmd.Env = append(os.Environ(), "HOME="+cwd, "TERM=xterm-color")
+	cmd.Env = append(os.Environ(), "HOME="+cwd, "TERM=xterm-256color")
 
 	ptmx, err := pty.Start(cmd)
 	if err != nil {

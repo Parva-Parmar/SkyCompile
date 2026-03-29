@@ -1,9 +1,10 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Editor from "@monaco-editor/react";
 import * as monaco from "monaco-editor";
 import * as Y from "yjs";
 import { WebsocketProvider } from "y-websocket";
 import { MonacoBinding } from "y-monaco";
+import { useTheme } from "../ThemeContext";
 
 // Language detection based on file extension
 const getLanguageFromExtension = (filename: string): string => {
@@ -408,63 +409,96 @@ export default function MonacoEditor({
     projectId?: string;
     path?: string;
 }) {
-    const editorRef = useRef<any>(null);
+    const { theme } = useTheme();
+    const [editorInstance, setEditorInstance] = useState<any>(null);
     const providerRef = useRef<WebsocketProvider | null>(null);
     const bindingRef = useRef<MonacoBinding | null>(null);
 
     const handleEditorDidMount = (editor: any, monacoInstance: any) => {
-        editorRef.current = editor;
+        setEditorInstance(editor);
 
         // Detect language from file path
         const language = path ? getLanguageFromExtension(path) : 'plaintext';
         
         // Configure IntelliSense for the detected language
         configureLanguageFeatures(language, editor);
-
-        if (import.meta.env.VITE_COLLAB_ENABLED === 'true' && projectId && path) {
-            // Encode the parameters natively into the room string so y-websocket appends it as /ws/projectId_encodedPath
-            const roomName = `${projectId}_${btoa(path)}`;
-            
-            const doc = new Y.Doc();
-            const provider = new WebsocketProvider(
-                "ws://localhost:8082/ws",
-                roomName,
-                doc
-            );
-            
-            const type = doc.getText("monaco");
-            const binding = new MonacoBinding(
-                type,
-                editor.getModel(),
-                new Set([editor]),
-                provider.awareness
-            );
-
-            providerRef.current = provider;
-            bindingRef.current = binding;
-        }
     };
 
     useEffect(() => {
+        if (!editorInstance || import.meta.env.VITE_COLLAB_ENABLED !== 'true' || !projectId || !path) {
+            return;
+        }
+
+        // Encode the parameters natively into the room string so y-websocket appends it
+        const roomName = `${projectId}_${btoa(path)}`;
+        
+        const doc = new Y.Doc();
+        const type = doc.getText("monaco");
+
+        const provider = new WebsocketProvider(
+            `ws://${window.location.hostname}:8082/ws`,
+            roomName,
+            doc
+        );
+
+        // Generate random color identity to support named multi-cursor tracking
+        const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#ff9800', '#ff5722'];
+        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+        
+        provider.awareness.setLocalStateField('user', {
+            name: 'Collaborator ' + Math.floor(Math.random() * 100),
+            color: randomColor
+        });
+
+        provider.on('status', (event: any) => {
+            console.log("YJS Collab Status:", event.status);
+        });
+
+        // Bootstrap data onto the Yjs doc if the empty server buffer opens up
+        provider.on('sync', (isSynced: boolean) => {
+            if (isSynced && type.toString() === "" && value) {
+                type.insert(0, value);
+            }
+        });
+
+        // Pass changes cleanly back to HTTP hook context
+        type.observe(() => {
+            if (onChange) {
+                onChange(type.toString());
+            }
+        });
+
+        const binding = new MonacoBinding(
+            type,
+            editorInstance.getModel(),
+            new Set([editorInstance]),
+            provider.awareness
+        );
+
+        providerRef.current = provider;
+        bindingRef.current = binding;
+
         return () => {
-             bindingRef.current?.destroy();
-             providerRef.current?.destroy();
+             binding.destroy();
+             provider.destroy();
+             doc.destroy();
         };
-    }, [projectId, path]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [editorInstance, projectId, path]);
 
     return (
         <div className="h-full w-full">
             {import.meta.env.VITE_COLLAB_ENABLED === 'true' ? (
                 <Editor
                     height="100%"
-                    theme="vs-dark"
+                    theme={theme === "dark" ? "vs-dark" : "light"}
                     language={path ? getLanguageFromExtension(path) : 'plaintext'}
                     onMount={handleEditorDidMount}
                 />
             ) : (
                 <Editor
                     height="100%"
-                    theme="vs-dark"
+                    theme={theme === "dark" ? "vs-dark" : "light"}
                     language={path ? getLanguageFromExtension(path) : 'plaintext'}
                     value={value}
                     onChange={(v) => onChange(v || "")}

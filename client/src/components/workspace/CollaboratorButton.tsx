@@ -14,7 +14,7 @@ export default function CollaboratorButton({ projectId, currentUserId }: Collabo
     <>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+        className="flex items-center gap-2 px-3 py-2 bg-[var(--accent)] text-white rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
       >
         {isOpen ? <X className="w-4 h-4" /> : <Users className="w-4 h-4" />}
         {isOpen ? "Close" : "Team"}
@@ -22,12 +22,12 @@ export default function CollaboratorButton({ projectId, currentUserId }: Collabo
 
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-gray-900 rounded-lg w-full max-w-4xl h-96 mx-4">
-            <div className="flex items-center justify-between p-4 border-b border-gray-700">
-              <h2 className="text-lg font-semibold text-white">Collaborators</h2>
+          <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg w-full max-w-4xl h-96 mx-4 shadow-xl text-[var(--text-primary)]">
+            <div className="flex items-center justify-between p-4 border-b border-[var(--border-color)]">
+              <h2 className="text-lg font-semibold text-[var(--text-primary)]">Collaborators</h2>
               <button
                 onClick={() => setIsOpen(false)}
-                className="text-gray-400 hover:text-white"
+                className="text-[var(--text-muted)] hover:text-[var(--text-primary)]"
               >
                 <X className="w-5 h-5" />
               </button>

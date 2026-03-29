@@ -131,7 +131,6 @@ replay_pid*
 
 # Maven
 backend-spring/target/
-backend-spring/.mvn/wrapper/maven-wrapper.jar
 backend-spring/.mvn/wrapper/maven-wrapper.properties
 backend-spring/.mvn/wrapper/
 *.log
@@ -143,12 +142,12 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
 
 # Gradle
 backend-spring/.gradle
 backend-spring/build/
-backend-spring/!gradle/wrapper/gradle-wrapper.jar
+!backend-spring/.gradle/wrapper/gradle-wrapper.jar
 backend-spring/!**/src/main/**/build/
 backend-spring/!**/src/test/**/build/
 
@@ -171,7 +170,7 @@ backend-spring/build/
 backend-spring/nbbuild/
 backend-spring/dist/
 backend-spring/nbdist/
-backend-sspring/.nb-gradle/
+backend-spring/.nb-gradle/
 
 # VS Code
 backend-spring/.vscode/
@@ -213,8 +212,11 @@ backend-go/*.exe
 # =============================================================================
 # PostgreSQL data files
 *.sql
+!database/init.sql
+!backend-spring/src/main/resources/schema.sql
 *.dump
 *.backup
+skycompiler_db_data/
 
 # =============================================================================
 # COLLABORATION FILES
@@ -317,6 +319,16 @@ $RECYCLE.BIN/
 .directory
 .Trash-*
 .nfs*
+
+# =============================================================================
+# PYTHON ENVIRONMENTS
+# =============================================================================
+venv/
+.venv/
+env/
+__pycache__/
+*.pyc
+*.pyo
 
 # =============================================================================
 # LOGS AND TEMPORARY FILES

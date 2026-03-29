@@ -21,8 +21,8 @@ type ProjectPermission struct {
 	CanEditFiles   bool `json:"canEditFiles"`
 }
 
-func getProjectRoot(userId, projectId string) string {
-	return filepath.Join("/app/skycompiler_projects", userId, projectId)
+func getProjectRoot(projectId string) string {
+	return filepath.Join("/app/skycompiler_projects", projectId)
 }
 
 // Check if user has permission to perform action on project
@@ -30,7 +30,8 @@ func checkProjectPermission(r *http.Request, userId, projectId, action string) (
 	fmt.Printf("DEBUG: checkProjectPermission called with userId=%s, projectId=%s, action=%s\n", userId, projectId, action)
 	
 	// Call Spring Boot API to check user permissions
-	url := fmt.Sprintf("http://localhost:8081/api/v1/projects/%s/permissions?action=%s", projectId, action)
+	// Using Docker Compose service name instead of localhost
+	url := fmt.Sprintf("http://backend-spring:8081/api/v1/projects/%s/permissions?action=%s", projectId, action)
 	fmt.Printf("DEBUG: Calling permission API at URL: %s\n", url)
 	
 	req, err := http.NewRequest("GET", url, nil)
@@ -88,7 +89,7 @@ func checkProjectPermissionDirect(userId, projectId, action string) (bool, error
 	// In a real implementation, this would query the database directly
 	
 	// Check if user is the project owner (project directory ownership)
-	projectRoot := getProjectRoot(userId, projectId)
+	projectRoot := getProjectRoot(projectId)
 	
 	stat, err := os.Stat(projectRoot)
 	if err == nil {
@@ -154,7 +155,7 @@ func handleFileApi(w http.ResponseWriter, r *http.Request) {
 
 	projectId := segments[0]
 	action := segments[1] // "files" or "folders"
-	projectRoot := getProjectRoot(userId, projectId)
+	projectRoot := getProjectRoot(projectId)
 
 	// Ensure the root directory actually exists for new projects securely
 	os.MkdirAll(projectRoot, 0755)

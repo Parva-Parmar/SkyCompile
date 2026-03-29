@@ -69,16 +69,16 @@ export default function CollaboratorModal({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-gray-800 rounded-lg w-full max-w-md mx-4">
+      <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg w-full max-w-md mx-4 shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-700">
+        <div className="flex items-center justify-between p-6 border-b border-[var(--border-color)]">
           <div className="flex items-center gap-2">
-            <Users className="w-5 h-5 text-blue-400" />
-            <h2 className="text-xl font-semibold text-white">Add Collaborator</h2>
+            <Users className="w-5 h-5 text-[var(--accent)]" />
+            <h2 className="text-xl font-semibold text-[var(--text-primary)]">Add Collaborator</h2>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-white transition-colors"
+            className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -89,7 +89,7 @@ export default function CollaboratorModal({
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email Input */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                 Email Address
               </label>
               <EmailAutocompleteInput
@@ -103,7 +103,7 @@ export default function CollaboratorModal({
 
             {/* Role Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-[var(--text-primary)] mb-2">
                 Role
               </label>
               <div className="space-y-2">
@@ -114,21 +114,21 @@ export default function CollaboratorModal({
                 ].map(({ value, label, desc }) => (
                   <label
                     key={value}
-                    className="flex items-center p-3 bg-gray-700 border rounded-lg cursor-pointer transition-colors hover:bg-gray-600"
+                    className="flex items-center p-3 bg-[var(--bg-elevated)] border border-[var(--border-color)] rounded-lg cursor-pointer transition-colors hover:bg-[var(--bg-secondary)]"
                   >
                     <input
                       type="radio"
                       value={value}
                       checked={role === value}
                       onChange={(e) => setRole(e.target.value as ProjectRole)}
-                      className="mr-3 text-blue-500"
+                      className="mr-3 text-[var(--accent)] focus:ring-[var(--accent)]"
                     />
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-white font-medium">{label}</span>
-                        <Shield className="w-4 h-4 text-gray-400" />
+                        <span className="text-[var(--text-primary)] font-medium">{label}</span>
+                        <Shield className="w-4 h-4 text-[var(--text-muted)]" />
                       </div>
-                      <span className="text-gray-400 text-sm">{desc}</span>
+                      <span className="text-[var(--text-muted)] text-sm">{desc}</span>
                     </div>
                   </label>
                 ))}
@@ -138,14 +138,14 @@ export default function CollaboratorModal({
             {/* Friends Section */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-sm font-medium text-gray-300">
+                <label className="text-sm font-medium text-[var(--text-primary)]">
                   Quick Add from Friends
                 </label>
                 <button
                   type="button"
                   onClick={loadFriends}
                   disabled={loadingFriends}
-                  className="text-xs text-blue-400 hover:text-blue-300 disabled:opacity-50"
+                  className="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)] disabled:opacity-50"
                 >
                   {loadingFriends ? "Loading..." : "Load Friends"}
                 </button>
@@ -158,19 +158,19 @@ export default function CollaboratorModal({
                       key={friend.id}
                       type="button"
                       onClick={() => handleFriendSelect(friend.email, "EDITOR")}
-                      className="w-full text-left p-2 bg-gray-700 rounded hover:bg-gray-600 transition-colors"
+                      className="w-full text-left p-2 bg-[var(--bg-elevated)] border border-[var(--border-color)] rounded hover:bg-[var(--bg-secondary)] transition-colors"
                     >
-                      <div className="text-white text-sm">
+                      <div className="text-[var(--text-primary)] text-sm">
                         {friend.firstname} {friend.lastname}
                       </div>
-                      <div className="text-gray-400 text-xs">{friend.email}</div>
+                      <div className="text-[var(--text-muted)] text-xs">{friend.email}</div>
                     </button>
                   ))}
                 </div>
               )}
               
               {friends.length === 0 && !loadingFriends && (
-                <div className="text-gray-400 text-sm">No friends available</div>
+                <div className="text-[var(--text-muted)] text-sm">No friends available</div>
               )}
             </div>
 
@@ -186,14 +186,14 @@ export default function CollaboratorModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-colors"
+                className="flex-1 px-4 py-2 bg-[var(--bg-elevated)] text-[var(--text-primary)] border border-[var(--border-color)] rounded-lg hover:bg-[var(--bg-secondary)] transition-colors"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 px-4 py-2 bg-[var(--accent)] text-white rounded-lg hover:bg-[var(--accent-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? "Adding..." : "Add Collaborator"}
               </button>

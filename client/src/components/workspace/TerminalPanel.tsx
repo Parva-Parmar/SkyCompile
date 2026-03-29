@@ -6,12 +6,25 @@ export default function TerminalPanel({
     projectId,
     userId,
     onFileChange,
+    theme,
 }: {
     projectId: string;
     userId: string;
     onFileChange?: () => void;
+    theme: string;
 }) {
     const ref = useRef<HTMLDivElement>(null);
+    const termRef = useRef<Terminal | null>(null);
+
+    useEffect(() => {
+        if (termRef.current) {
+            termRef.current.options.theme = {
+                background: theme === "dark" ? "#1e1e1e" : "#f8fafc",
+                foreground: theme === "dark" ? "#d4d4d4" : "#0f172a",
+                cursor: theme === "dark" ? "#ffffff" : "#000000",
+            };
+        }
+    }, [theme]);
 
     useEffect(() => {
         if (!ref.current) return;
@@ -21,10 +34,13 @@ export default function TerminalPanel({
             fontSize: 14,
             scrollback: 1000, // Allow 1000 lines of scrollback
             theme: {
-                background: "#1e1e1e",
-                foreground: "#d4d4d4",
+                background: theme === "dark" ? "#1e1e1e" : "#f8fafc",
+                foreground: theme === "dark" ? "#d4d4d4" : "#0f172a",
+                cursor: theme === "dark" ? "#ffffff" : "#000000",
             },
         });
+        
+        termRef.current = term;
 
         term.open(ref.current);
         term.focus();

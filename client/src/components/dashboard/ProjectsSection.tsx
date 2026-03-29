@@ -47,12 +47,11 @@ export default function ProjectsSection() {
                 <input
                     value={newProject}
                     onChange={(e) => setNewProject(e.target.value)}
-                    placeholder="New project name"
-                    className="flex-1 border rounded px-3 py-2"
+                    className="flex-1 border border-[var(--border-color)] bg-[var(--bg-elevated)] text-[var(--text-primary)] rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
                 />
                 <button
                     onClick={handleCreate}
-                    className="bg-indigo-500 text-white px-4 py-2 rounded"
+                    className="bg-[var(--accent)] text-white px-4 py-2 rounded hover:bg-[var(--accent-hover)] transition-colors"
                 >
                     Add Project
                 </button>
