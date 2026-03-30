@@ -57,9 +57,25 @@ func getTerminalRoom(userId, projectId string) (*TerminalRoom, error) {
 		os.WriteFile(bashrcPath, []byte(`export PS1="\[\e[32m\]skycompile\[\e[m\]:\[\e[34m\]\w\[\e[m\]\$ "`+"\n"), 0644)
 	}
 
-	cmd := exec.Command("bash")
-	cmd.Dir = cwd
-	cmd.Env = append(os.Environ(), "HOME="+cwd, "TERM=xterm-256color")
+	// Use bubblewrap (bwrap) to spawn a fully isolated bash instance
+	cmd := exec.Command("bwrap",
+		"--ro-bind", "/", "/",                  // Read-only map entire root system
+		"--tmpfs", "/app/skycompiler_projects", // Hide all other projects
+		"--bind", cwd, "/workspace",            // Mount their project to /workspace dynamically
+		"--dev", "/dev",                        // Minimal device files
+		"--proc", "/proc",                      // Clean process directory
+		"--unshare-pid",                        // Hides host processes like the golang backend server
+		"--share-net",                          // Allow outward network access
+		"--chdir", "/workspace",                // Start at /workspace
+		"bash",
+	)
+	
+	// Create a clean environment without leaking backend variables
+	cmd.Env = []string{
+		"HOME=/workspace",
+		"TERM=xterm-256color",
+		"PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+	}
 
 	ptmx, err := pty.Start(cmd)
 	if err != nil {
