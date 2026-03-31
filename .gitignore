@@ -1,0 +1,16 @@
+# Ignore DB / volumes
+skycompiler_db_data/
+
+# Ignore project runtime data
+skycompiler_projects/
+
+# Ignore system files
+*.log
+*.pid
+*.sock
+
+# Ignore bash history
+.bash_history
+
+# IDE
+.idea/
