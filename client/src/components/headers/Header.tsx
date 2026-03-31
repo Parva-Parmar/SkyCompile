@@ -1,48 +1,69 @@
-import React from "react";
+
 import { Link } from "react-router-dom";
+import { useTheme } from "../ThemeContext";
+import { Sun, Moon } from "lucide-react";
 
 export default function Header() {
+  const { theme, toggleTheme } = useTheme();
+
   return (
-    <>
-      <header className="text-gray-600 body-font">
-        <div className="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
-          <a className="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0">
+    <header className="glass sticky top-0 z-50 transition-colors duration-300">
+      <div className="container mx-auto flex flex-wrap p-4 flex-row items-center justify-between">
+        <Link to="/" className="flex font-sans font-medium items-center text-[var(--text-primary)] hover:opacity-80 transition-opacity">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            className="w-10 h-10 text-white p-2 bg-[var(--accent)] rounded-lg shadow-lg flex-shrink-0"
+            viewBox="0 0 24 24"
+          >
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+          </svg>
+          <span className="ml-3 text-2xl font-bold tracking-tight">SkyCompile</span>
+        </Link>
+        
+        <div className="flex items-center gap-4">
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-full hover:bg-[var(--glass-border)] transition-colors focus:outline-none"
+            aria-label="Toggle Dark Mode"
+          >
+            {theme === "dark" ? (
+              <Sun className="w-5 h-5 text-yellow-400" />
+            ) : (
+              <Moon className="w-5 h-5 text-[var(--accent)]" />
+            )}
+          </button>
+          
+          <Link
+            to="/signin"
+            className="inline-flex items-center justify-center font-medium text-[var(--text-primary)] hover:text-[var(--accent)] hover:opacity-80 transition-colors px-4 py-2 sm:ml-2"
+          >
+            Sign In
+          </Link>
+
+          <Link
+            to="/signup"
+            className="inline-flex items-center justify-center font-medium bg-[var(--accent)] text-white border-0 py-2 px-6 focus:outline-none hover:bg-[var(--accent-hover)] rounded-full text-sm shadow-md transition-all sm:ml-4"
+          >
+            Get Started
             <svg
-              xmlns="http://www.w3.org/2000/svg"
               fill="none"
               stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              className="w-10 h-10 text-white p-2 bg-indigo-500 rounded-full"
-              viewBox="0 0 24 24"
-            >
-              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
-            </svg>
-            <span className="ml-3 text-xl">Tailblocks</span>
-          </a>
-          <nav className="md:mr-auto md:ml-4 md:py-1 md:pl-4 md:border-l md:border-gray-400	flex flex-wrap items-center text-base justify-center">
-            <a className="mr-5 hover:text-gray-900">First Link</a>
-            <a className="mr-5 hover:text-gray-900">Second Link</a>
-            <a className="mr-5 hover:text-gray-900">Third Link</a>
-            <a className="mr-5 hover:text-gray-900">Fourth Link</a>
-          </nav>
-          <button className="inline-flex items-center bg-gray-100 border-0 py-1 px-3 focus:outline-none hover:bg-gray-200 rounded text-base mt-4 md:mt-0">
-           <Link to="/signup">Create a new account</Link>
-            <svg
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              className="w-4 h-4 ml-1"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              className="w-4 h-4 ml-2"
               viewBox="0 0 24 24"
             >
               <path d="M5 12h14M12 5l7 7-7 7"></path>
             </svg>
-          </button>
+          </Link>
         </div>
-      </header>
-    </>
+      </div>
+    </header>
   );
 }

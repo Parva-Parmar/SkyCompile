@@ -1,1 +1,87 @@
 @import "tailwindcss";
+
+@theme {
+  --color-glass: rgba(255, 255, 255, 0.1);
+  --color-glass-dark: rgba(0, 0, 0, 0.2);
+  --color-surface: #ffffff;
+  --color-surface-dark: #121212;
+}
+
+@layer base {
+  :root {
+    --bg-primary: #f8fafc;
+    --bg-secondary: #f1f5f9;
+    --bg-elevated: #ffffff;
+    --text-primary: #0f172a;
+    --text-muted: #64748b;
+    --accent: #6366f1;
+    --accent-hover: #4f46e5;
+    --glass-bg: rgba(255, 255, 255, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --card-surface: rgba(255, 255, 255, 0.8);
+    --card-border: #e2e8f0;
+    --border-color: #e2e8f0;
+    --workspace-bg: #ffffff;
+    --sidebar-bg: #f1f5f9;
+    --panel-bg: #f8fafc;
+  }
+  
+  .dark {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-elevated: #334155;
+    --text-primary: #f8fafc;
+    --text-muted: #94a3b8;
+    --accent: #818cf8;
+    --accent-hover: #a5b4fc;
+    --glass-bg: rgba(15, 23, 42, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --card-surface: rgba(30, 41, 59, 0.8);
+    --card-border: #334155;
+    --border-color: #1e293b;
+    --workspace-bg: #1e1e1e;
+    --sidebar-bg: #181818;
+    --panel-bg: #1e1e1e;
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  }
+}
+
+/* Glassmorphism utility */
+.glass {
+  background-color: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+}
+
+/* Terminal improvements for smooth scrolling */
+.xterm {
+    scrollbar-width: thin;
+    scrollbar-color: #4a4a4a #2a2a2a;
+}
+.xterm::-webkit-scrollbar {
+    width: 8px;
+}
+.xterm::-webkit-scrollbar-track {
+    background: transparent;
+}
+.xterm::-webkit-scrollbar-thumb {
+    background-color: #4a4a4a;
+    border-radius: 4px;
+}
+.xterm::-webkit-scrollbar-thumb:hover {
+    background-color: #5a5a5a;
+}
+.xterm-viewport {
+    scroll-behavior: smooth;
+}
+.terminal-container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}

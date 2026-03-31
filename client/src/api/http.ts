@@ -1,4 +1,8 @@
-const API_BASE_URL = "http://localhost:3000/api/v1";
+const USE_SPRING_BOOT = import.meta.env.VITE_USE_SPRING_BOOT === 'true';
+const SPRING_BOOT_URL = "http://localhost:8081/api/v1";
+const NODE_URL = "http://localhost:3000/api/v1";
+
+const API_BASE_URL = USE_SPRING_BOOT ? SPRING_BOOT_URL : NODE_URL;
 
 const getToken = () => localStorage.getItem("token");
 
@@ -18,13 +22,22 @@ export async function postRequest(endpoint: string, body: unknown){
     },
     body: JSON.stringify(body),
   } );
-  const data  = await res.json();
 
   if(!res.ok){
-    throw new Error(data.message || "Request failed");
+    let errorMessage = "Request failed";
+    try {
+      const errorData = await res.json();
+      errorMessage = errorData.message || errorMessage;
+    } catch (e) {
+      // If response is not JSON, use status text
+      errorMessage = res.statusText || `HTTP ${res.status}`;
+    }
+    throw new Error(errorMessage);
   }
 
-  return data;  
+  // Only try to parse JSON if there's content
+  const text = await res.text();
+  return text ? JSON.parse(text) : {};
 }
 
 export const getAuthRequest = async (url: string) => {
@@ -37,26 +50,47 @@ export const getAuthRequest = async (url: string) => {
   });
 
   if (!res.ok) {
-    throw new Error("Unauthorized");
+    let errorMessage = "Request failed";
+    try {
+      const errorData = await res.json();
+      errorMessage = errorData.message || errorMessage;
+    } catch (e) {
+      errorMessage = res.statusText || `HTTP ${res.status}`;
+    }
+    throw new Error(errorMessage);
   }
 
-  return res.json();
+  const text = await res.text();
+  return text ? JSON.parse(text) : {};
 };
 
 export const postAuthRequest = async (url: string, body: any) => {
+  const token = getToken();
   const res = await fetch(`${API_BASE_URL}${url}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${getToken()}`,
+      Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(body),
   });
-  return res.json();
+
+  if (!res.ok) {
+    let errorMessage = "Request failed";
+    try {
+      const errorData = await res.json();
+      errorMessage = errorData.message || errorMessage;
+    } catch (e) {
+      errorMessage = res.statusText || `HTTP ${res.status}`;
+    }
+    throw new Error(errorMessage);
+  }
+
+  const text = await res.text();
+  return text ? JSON.parse(text) : {};
 };
 
 export const deleteAuthRequest = async (url: string) => {
-  console.log("delete test")
   const res = await fetch(`${API_BASE_URL}${url}`, {
     method: "DELETE",
     headers: {
@@ -67,6 +101,18 @@ export const deleteAuthRequest = async (url: string) => {
   if (res.status === 204) {
     return;
   }
+
+  if (!res.ok) {
+    let errorMessage = "Request failed";
+    try {
+      const errorData = await res.json();
+      errorMessage = errorData.message || errorMessage;
+    } catch (e) {
+      errorMessage = res.statusText || `HTTP ${res.status}`;
+    }
+    throw new Error(errorMessage);
+  }
   
-  return res.json();
+  const text = await res.text();
+  return text ? JSON.parse(text) : {};
 };

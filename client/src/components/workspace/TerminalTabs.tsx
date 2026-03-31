@@ -12,15 +12,15 @@ export default function TerminalTabs({
     onCreate: () => void;
 }) {
     return (
-        <div className="flex items-center border-b border-[#2a2a2a] bg-[#1e1e1e] text-sm">
+        <div className="flex items-center border-b border-[var(--border-color)] bg-[var(--sidebar-bg)] text-sm">
             {terminals.map((id, i) => (
                 <div
                     key={id}
                     onClick={() => onSelect(id)}
                     className={`px-3 py-1 flex items-center gap-2 cursor-pointer
             ${activeTerminal === id
-                            ? "bg-[#252526]"
-                            : "hover:bg-[#2a2a2a]"
+                            ? "bg-[var(--panel-bg)] text-[var(--text-primary)]"
+                            : "hover:bg-[var(--bg-elevated)] text-[var(--text-muted)]"
                         }`}
                 >
                     <span>Terminal {i + 1}</span>
@@ -29,7 +29,7 @@ export default function TerminalTabs({
                             e.stopPropagation();
                             onClose(id);
                         }}
-                        className="text-gray-400 hover:text-red-400"
+                        className="text-[var(--text-muted)] hover:text-red-400 transition-colors"
                     >
                         ✕
                     </button>
@@ -38,7 +38,7 @@ export default function TerminalTabs({
 
             <button
                 onClick={onCreate}
-                className="ml-2 px-2 text-green-400 hover:text-green-300"
+                className="ml-2 px-2 text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors text-lg font-bold"
             >
                 +
             </button>

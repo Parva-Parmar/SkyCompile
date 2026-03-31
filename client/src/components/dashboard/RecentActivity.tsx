@@ -1,7 +1,7 @@
 export default function RecentActivity() {
     return (
-        <div className="bg-white p-6 rounded-lg shadow">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+        <div className="bg-[var(--bg-secondary)] p-6 rounded-lg shadow border border-[var(--border-color)]">
+            <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">
                 Recent Activity
             </h3>
 
@@ -11,7 +11,7 @@ export default function RecentActivity() {
                     "New collaborator joined",
                     "Project deployed",
                 ].map((activity, i) => (
-                    <li key={i} className="text-gray-600 text-sm">
+                    <li key={i} className="text-[var(--text-muted)] text-sm">
                         • {activity}
                     </li>
                 ))}

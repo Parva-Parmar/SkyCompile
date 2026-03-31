@@ -1,0 +1,65 @@
+
+services:
+  backend-spring:
+    build: ./backend-spring
+    container_name: skycompile-spring
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://ep-dawn-sky-a1o07loy-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
+      - SPRING_DATASOURCE_USERNAME=neondb_owner
+      - SPRING_DATASOURCE_PASSWORD=npg_7M0KQXNvkRzw
+      - JWT_SECRET=super_secret_dev_key_123_upgraded_to_256_bits_for_skycompile!
+      # Use update for new database setup, then change to validate
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_PROFILES_ACTIVE=docker
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  backend-go:
+    build: ./backend-go
+    container_name: skycompile-go
+    ports:
+      - "8082:8082"
+    environment:
+      - JWT_SECRET=super_secret_dev_key_123_upgraded_to_256_bits_for_skycompile!
+    volumes:
+      - ./skycompiler_projects:/app/skycompiler_projects
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  client:
+    build: ./client
+    container_name: skycompile-client
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_USE_SPRING_BOOT=true
+      - VITE_COLLAB_ENABLED=true
+    depends_on:
+      backend-spring:
+        condition: service_healthy
+      backend-go:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5173"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  default:
+    name: skycompile-network
+

@@ -17,22 +17,36 @@ export default function ProjectCards({
                 <div
                     key={project.id}
                     onClick={() => onOpen(project.id)} // ✅ OPEN WORKSPACE
-                    className="border rounded p-4 flex justify-between items-center cursor-pointer hover:bg-gray-50"
+                    className="border border-[var(--border-color)] bg-[var(--bg-secondary)] rounded p-4 flex flex-col justify-between cursor-pointer hover:bg-[var(--bg-elevated)] transition-colors"
                 >
                     <div>
-                        <p className="text-sm text-gray-500">#{index + 1}</p>
-                        <h3 className="font-semibold">{project.name}</h3>
+                        <p className="text-sm text-[var(--accent)]">#{index + 1}</p>
+                        <h3 className="font-semibold text-lg text-[var(--text-primary)]">{project.name}</h3>
+                        
+                        {/* Owner Information */}
+                        {project.owner && (
+                            <div className="mt-2 text-sm text-[var(--text-muted)]">
+                                <p className="font-medium text-[var(--text-primary)]">Owner:</p>
+                                <p className="text-[var(--text-primary)]">{project.owner.name}</p>
+                                <p className="text-xs text-[var(--text-muted)] opacity-75">{project.owner.email}</p>
+                            </div>
+                        )}
                     </div>
 
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation(); // 🚨 IMPORTANT
-                            onDelete(project.id);
-                        }}
-                        className="text-red-500 hover:text-red-700"
-                    >
-                        Delete
-                    </button>
+                    <div className="flex justify-between items-center mt-3 pt-3 border-t border-[var(--border-color)]">
+                        <span className="text-xs text-[var(--text-muted)]">
+                            {project.created_at ? new Date(project.created_at).toLocaleDateString() : 'Unknown date'}
+                        </span>
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation(); // 🚨 IMPORTANT
+                                onDelete(project.id);
+                            }}
+                            className="text-red-500 hover:text-red-700 text-sm font-medium"
+                        >
+                            Delete
+                        </button>
+                    </div>
                 </div>
             ))}
         </div>
