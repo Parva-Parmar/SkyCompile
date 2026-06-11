@@ -25,14 +25,23 @@ export default function ProjectsSection() {
 
     const handleCreate = async () => {
         if (!newProject.trim()) return;
-        await createProject(newProject);
-        setNewProject("");
-        loadProjects();
+        try {
+            await createProject(newProject);
+            setNewProject("");
+            loadProjects();
+        } catch (err: any) {
+            alert(err.message || "Failed to create project");
+        }
     };
 
     const handleDelete = async (id: string) => {
-        await deleteProject(id);
-        loadProjects();
+        if (!confirm("Are you sure you want to delete this project?")) return;
+        try {
+            await deleteProject(id);
+            loadProjects();
+        } catch (err: any) {
+            alert(err.message || "Failed to delete project");
+        }
     };
 
     // ✅ NEW: open workspace
@@ -47,6 +56,7 @@ export default function ProjectsSection() {
                 <input
                     value={newProject}
                     onChange={(e) => setNewProject(e.target.value)}
+                    placeholder="New project name..."
                     className="flex-1 border border-[var(--border-color)] bg-[var(--bg-elevated)] text-[var(--text-primary)] rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
                 />
                 <button

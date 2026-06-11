@@ -31,21 +31,6 @@ public class AuthController {
     private final com.skycompile.backend_spring.repositories.ProjectMemberRepository projectMemberRepository;
     private final com.skycompile.backend_spring.repositories.FriendshipRepository friendshipRepository;
     
-    // Test endpoint to verify changes are applied
-    @GetMapping("/test")
-    public String test() {
-        return "AuthController is working! Version: " + System.currentTimeMillis();
-    }
-    
-    // Test POST endpoint
-    @PostMapping("/test-post")
-    public ResponseEntity<?> testPost(@RequestBody Map<String, Object> payload) {
-        return ResponseEntity.ok(Map.of(
-            "message", "POST endpoint working!",
-            "received", payload,
-            "timestamp", System.currentTimeMillis()
-        ));
-    }
 
     @PostMapping("/signin")
     public ResponseEntity<AuthDto.AuthResponse> authenticateUser(@RequestBody AuthDto.LoginRequest loginRequest) {
@@ -141,5 +126,16 @@ public class AuthController {
                         .friend_count(friendCount)
                         .build())
                 .build());
+    }
+    @ExceptionHandler(org.springframework.security.core.AuthenticationException.class)
+    public ResponseEntity<?> handleAuthenticationException(org.springframework.security.core.AuthenticationException e) {
+        return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED)
+                .body(java.util.Map.of("error", "Unauthorized", "message", "Invalid email or password"));
+    }
+
+    @ExceptionHandler(java.util.NoSuchElementException.class)
+    public ResponseEntity<?> handleNoSuchElementException(java.util.NoSuchElementException e) {
+        return ResponseEntity.status(org.springframework.http.HttpStatus.UNAUTHORIZED)
+                .body(java.util.Map.of("error", "Unauthorized", "message", "User not found"));
     }
 }

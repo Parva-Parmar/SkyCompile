@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Terminal } from "@xterm/xterm";
 import "@xterm/xterm/css/xterm.css";
 
@@ -15,6 +15,8 @@ export default function TerminalPanel({
 }) {
     const ref = useRef<HTMLDivElement>(null);
     const termRef = useRef<Terminal | null>(null);
+    const [isDisconnected, setIsDisconnected] = useState(false);
+    const [reconnectTrigger, setReconnectTrigger] = useState(0);
 
     useEffect(() => {
         if (termRef.current) {
@@ -112,7 +114,7 @@ export default function TerminalPanel({
                 term.write("\r\n\x1b[32m[SkyCompile Native Gateway]: Connected successfully.\x1b[0m\r\n");
                 // Hit enter to display the bash prompt cleanly
                 if (ws && ws.readyState === WebSocket.OPEN) {
-                    ws.send("\n");
+                    ws.send("\r");
                 }
             };
 
@@ -120,10 +122,13 @@ export default function TerminalPanel({
                 isConnecting = false;
                 if (!event.wasClean && reconnectTimeout === null && connectionAttempts < maxConnectionAttempts) {
                     term.write("\r\n\x1b[33m[Connection lost unexpectedly. Retrying in 3s...]\x1b[0m\r\n");
-                    reconnectTimeout = setTimeout(() => {
+                    reconnectTimeout = window.setTimeout(() => {
                         reconnectTimeout = null;
                         connectWebSocket();
                     }, 3000);
+                } else if (connectionAttempts >= maxConnectionAttempts || event.wasClean) {
+                    setIsDisconnected(true);
+                    term.write("\r\n\x1b[31m[Connection permanently closed.]\x1b[0m\r\n");
                 }
             };
 
@@ -146,18 +151,8 @@ export default function TerminalPanel({
             term.focus();
         };
 
-        const handleWheel = (event: WheelEvent) => {
-            // Allow smooth scrolling with mouse wheel
-            if (event.deltaY < 0) {
-                term.scrollLines(-1);
-            } else {
-                term.scrollLines(1);
-            }
-        };
-
         // Add event listeners
         ref.current.addEventListener('focus', handleTerminalFocus);
-        ref.current.addEventListener('wheel', handleWheel, { passive: true });
 
         let commandBuffer = '';
         let isUserScrolling = false;
@@ -216,11 +211,40 @@ export default function TerminalPanel({
             // Clean up event listeners
             if (ref.current) {
                 ref.current.removeEventListener('focus', handleTerminalFocus);
-                ref.current.removeEventListener('wheel', handleWheel);
             }
             term.dispose();
         };
-    }, [projectId, userId]);
+    }, [projectId, userId, reconnectTrigger]);
 
-    return <div ref={ref} className="h-full w-full terminal-container" />;
+    const handleReconnect = () => {
+        setIsDisconnected(false);
+        setReconnectTrigger(prev => prev + 1);
+    };
+
+    return (
+        <div className="relative h-full w-full">
+            <div ref={ref} className="h-full w-full terminal-container" />
+            {isDisconnected && (
+                <div className="absolute inset-0 bg-black/60 flex items-center justify-center z-10">
+                    <div className="bg-[var(--bg-secondary)] p-6 rounded-lg border border-[var(--border-color)] shadow-xl text-center max-w-sm mx-4">
+                        <div className="text-red-400 mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                        <h3 className="text-[var(--text-primary)] font-semibold mb-2">Connection Lost</h3>
+                        <p className="text-[var(--text-muted)] text-sm mb-4">
+                            The terminal connection to the server was lost after multiple attempts.
+                        </p>
+                        <button 
+                            onClick={handleReconnect}
+                            className="w-full px-4 py-2 bg-[var(--accent)] text-white rounded hover:bg-[var(--accent-hover)] transition-colors"
+                        >
+                            Reconnect
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
 }

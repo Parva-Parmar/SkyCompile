@@ -7,12 +7,14 @@ export default function FileNodeView({
     onSelect,
     onDelete,
     onRename,
+    onDownload,
 }: {
     node: FileNode;
     path: string;
     onSelect: (path: string) => void;
     onDelete: (path: string) => void;
     onRename: (oldPath: string, newPath: string) => void;
+    onDownload: (path: string) => void;
 }) {
     const [open, setOpen] = useState(true);
 
@@ -36,6 +38,12 @@ export default function FileNodeView({
         if (confirm(`Delete "${node.name}"?`)) {
             onDelete(fullPath);
         }
+    };
+
+    // ---- Download handler ----
+    const handleDownload = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        onDownload(fullPath);
     };
 
     // -------- Folder --------
@@ -72,6 +80,7 @@ export default function FileNodeView({
                             onSelect={onSelect}
                             onDelete={onDelete}
                             onRename={onRename}
+                            onDownload={onDownload}
                         />
                     ))}
             </div>
@@ -89,8 +98,17 @@ export default function FileNodeView({
             <button
                 onClick={handleRename}
                 className="text-xs opacity-60 hover:opacity-100"
+                title="Rename"
             >
                 ✏️
+            </button>
+
+            <button
+                onClick={handleDownload}
+                className="text-xs opacity-60 hover:opacity-100"
+                title="Download"
+            >
+                ⬇️
             </button>
 
             <button

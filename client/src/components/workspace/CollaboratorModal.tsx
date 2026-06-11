@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { X, Users, Shield } from "lucide-react";
 import { addProjectMember } from "../../api/projects";
 import type { ProjectMember, ProjectRole } from "../../api/projects";
@@ -25,6 +25,14 @@ export default function CollaboratorModal({
   const [error, setError] = useState("");
   const [friends, setFriends] = useState<Friend[]>([]);
   const [loadingFriends, setLoadingFriends] = useState(false);
+  const [hasLoadedFriends, setHasLoadedFriends] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && !hasLoadedFriends) {
+      loadFriends();
+      setHasLoadedFriends(true);
+    }
+  }, [isOpen, hasLoadedFriends]);
 
   const loadFriends = async () => {
     try {
@@ -147,7 +155,7 @@ export default function CollaboratorModal({
                   disabled={loadingFriends}
                   className="text-xs text-[var(--accent)] hover:text-[var(--accent-hover)] disabled:opacity-50"
                 >
-                  {loadingFriends ? "Loading..." : "Load Friends"}
+                  {loadingFriends ? "Loading..." : "Refresh"}
                 </button>
               </div>
               
@@ -169,8 +177,8 @@ export default function CollaboratorModal({
                 </div>
               )}
               
-              {friends.length === 0 && !loadingFriends && (
-                <div className="text-[var(--text-muted)] text-sm">No friends available</div>
+              {friends.length === 0 && !loadingFriends && hasLoadedFriends && (
+                <div className="text-[var(--text-muted)] text-sm">No friends yet</div>
               )}
             </div>
 

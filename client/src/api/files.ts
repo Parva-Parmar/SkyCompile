@@ -158,3 +158,46 @@ export const renameEntry = async (
   }
 };
 
+// Download project or file
+export const downloadProjectFile = async (
+  projectId: string,
+  path?: string
+) => {
+  const url = new URL(`${API_BASE_URL}/projects/${projectId}/download`);
+  if (path) {
+    url.searchParams.append("path", path);
+  }
+
+  const res = await fetch(url.toString(), {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to download");
+  }
+
+  // Get filename from Content-Disposition header if possible
+  const disposition = res.headers.get("Content-Disposition");
+  let filename = path ? path.split("/").pop()! : `project-${projectId}.zip`;
+  
+  if (disposition && disposition.indexOf("filename=") !== -1) {
+    const filenameMatch = disposition.match(/filename="([^"]+)"/);
+    if (filenameMatch && filenameMatch.length === 2) {
+      filename = filenameMatch[1];
+    }
+  }
+
+  const blob = await res.blob();
+  const blobUrl = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = blobUrl;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(blobUrl);
+};
+

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { postRequest } from "../api/http";
 import type { AuthResponse, SigninRequest } from "../types/database";
 import { getFullName } from "../types/database";
 
@@ -24,36 +25,12 @@ export default function Signin() {
     e.preventDefault();
     setError("");
 
-    console.log("Attempting login with:", { email: formData.email, password: "***" });
-    console.log("API Base URL:", import.meta.env.VITE_USE_SPRING_BOOT === 'true' ? "http://localhost:8081/api/v1" : "http://localhost:3000/api/v1");
-
     try {
-      const response = await fetch(`${import.meta.env.VITE_USE_SPRING_BOOT === 'true' ? "http://localhost:8081/api/v1" : "http://localhost:3000/api/v1"}/auth/signin`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      console.log("Response status:", response.status);
-      console.log("Response headers:", Object.fromEntries(response.headers.entries()));
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Error response:", errorText);
-        throw new Error(errorText || `HTTP ${response.status}`);
-      }
-
-      const data: AuthResponse = await response.json();
-      console.log("Login successful:", data);
+      const data: AuthResponse = await postRequest("/auth/signin", formData);
       
       // Store database-aligned user data
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-      
-      // Log full name for debugging
-      console.log("User full name:", getFullName(data.user));
       
       navigate("/dashboard");
     } catch (err: any) {

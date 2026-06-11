@@ -116,3 +116,27 @@ export const deleteAuthRequest = async (url: string) => {
   const text = await res.text();
   return text ? JSON.parse(text) : {};
 };
+
+export const downloadAuthRequest = async (url: string, filename: string) => {
+  const token = getToken();
+  const res = await fetch(`${API_BASE_URL}${url}`, {
+    method: "GET",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Download failed: ${res.statusText}`);
+  }
+
+  const blob = await res.blob();
+  const blobUrl = window.URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = blobUrl;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  window.URL.revokeObjectURL(blobUrl);
+};

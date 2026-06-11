@@ -445,8 +445,21 @@ export default function MonacoEditor({
         const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4caf50', '#8bc34a', '#ff9800', '#ff5722'];
         const randomColor = colors[Math.floor(Math.random() * colors.length)];
         
+        let userName = 'Collaborator ' + Math.floor(Math.random() * 100);
+        try {
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                if (user.firstname || user.lastname) {
+                    userName = `${user.firstname || ''} ${user.lastname || ''}`.trim();
+                }
+            }
+        } catch (e) {
+            // Ignore parse errors
+        }
+
         provider.awareness.setLocalStateField('user', {
-            name: 'Collaborator ' + Math.floor(Math.random() * 100),
+            name: userName,
             color: randomColor
         });
 

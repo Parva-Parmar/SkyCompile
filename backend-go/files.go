@@ -1,8 +1,10 @@
 package main
 
 import (
+	"archive/zip"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -120,6 +122,10 @@ func buildFileTree(dir string) ([]*FileTreeNode, error) {
 
 	var tree []*FileTreeNode
 	for _, entry := range entries {
+		if strings.HasPrefix(entry.Name(), ".") {
+			continue
+		}
+		
 		node := &FileTreeNode{
 			Name: entry.Name(),
 		}
@@ -292,6 +298,79 @@ func handleFileApi(w http.ResponseWriter, r *http.Request) {
 		os.MkdirAll(targetPath, 0755)
 		json.NewEncoder(w).Encode(map[string]bool{"success": true})
 		return
+	} else if action == "download" && r.Method == http.MethodGet {
+		pathQuery := r.URL.Query().Get("path")
+		if pathQuery != "" {
+			targetPath := filepath.Join(projectRoot, pathQuery)
+			if !strings.HasPrefix(targetPath, projectRoot) {
+				http.Error(w, "Access Denied", http.StatusForbidden)
+				return
+			}
+			
+			stat, err := os.Stat(targetPath)
+			if err != nil || stat.IsDir() {
+				http.Error(w, "File not found or is a directory", http.StatusNotFound)
+				return
+			}
+			
+			w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, filepath.Base(targetPath)))
+			w.Header().Set("Content-Type", "application/octet-stream")
+			http.ServeFile(w, r, targetPath)
+			return
+		} else {
+			w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="project-%s.zip"`, projectId))
+			w.Header().Set("Content-Type", "application/zip")
+			
+			zipWriter := zip.NewWriter(w)
+			defer zipWriter.Close()
+			
+			err := filepath.Walk(projectRoot, func(path string, info os.FileInfo, err error) error {
+				if err != nil {
+					return err
+				}
+				
+				relPath, _ := filepath.Rel(projectRoot, path)
+				if relPath == "." || strings.HasPrefix(filepath.Base(path), ".") {
+					if info.IsDir() && relPath != "." {
+						return filepath.SkipDir
+					}
+					return nil
+				}
+				
+				header, err := zip.FileInfoHeader(info)
+				if err != nil {
+					return err
+				}
+				
+				header.Name = relPath
+				if info.IsDir() {
+					header.Name += "/"
+				} else {
+					header.Method = zip.Deflate
+				}
+				
+				writer, err := zipWriter.CreateHeader(header)
+				if err != nil {
+					return err
+				}
+				
+				if !info.IsDir() {
+					file, err := os.Open(path)
+					if err != nil {
+						return err
+					}
+					defer file.Close()
+					_, err = io.Copy(writer, file)
+					return err
+				}
+				return nil
+			})
+			
+			if err != nil {
+				fmt.Printf("Error creating zip: %v\n", err)
+			}
+			return
+		}
 	}
 
 	http.Error(w, "Endpoint Not Found", http.StatusNotFound)

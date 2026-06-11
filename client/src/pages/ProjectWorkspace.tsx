@@ -21,6 +21,7 @@ import {
 import {
     deleteEntry,
     renameEntry,
+    downloadProjectFile,
 } from "../api/files";
 
 
@@ -219,6 +220,17 @@ export default function ProjectWorkspace() {
             showToast("Viewer cannot rename files");
         }
     };
+
+    const handleDownload = async (path?: string) => {
+        if (!projectId) return;
+        try {
+            showToast(path ? `Downloading file...` : `Downloading project...`);
+            await downloadProjectFile(projectId, path);
+        } catch (error) {
+            console.error("Failed to download:", error);
+            showToast("Download failed. Please try again.");
+        }
+    };
     const closeTab = (path: string) => {
         setOpenFiles((prev) => {
             const remaining = prev.filter((p) => p !== path);
@@ -308,6 +320,7 @@ export default function ProjectWorkspace() {
                     onCreateFolder={onCreateFolder}
                     onDelete={onDelete}
                     onRename={onRename}
+                    onDownload={handleDownload}
                 />
             }
             editor={

@@ -34,10 +34,24 @@ public class ProjectMemberController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProjectMember>> getMembers(@PathVariable UUID projectId) {
+    public ResponseEntity<List<java.util.Map<String, Object>>> getMembers(@PathVariable UUID projectId) {
         try {
             List<ProjectMember> members = projectService.getProjectMembers(projectId);
-            return new ResponseEntity<>(members, HttpStatus.OK);
+            List<java.util.Map<String, Object>> mapped = members.stream().map(m -> {
+                java.util.Map<String, Object> memberMap = new java.util.HashMap<>();
+                memberMap.put("id", m.getId());
+                memberMap.put("role", m.getRole().toString());
+                
+                java.util.Map<String, Object> userMap = new java.util.HashMap<>();
+                userMap.put("id", m.getUser().getId());
+                userMap.put("firstname", m.getUser().getFirstname());
+                userMap.put("lastname", m.getUser().getLastname());
+                userMap.put("email", m.getUser().getEmail());
+                
+                memberMap.put("user", userMap);
+                return memberMap;
+            }).collect(java.util.stream.Collectors.toList());
+            return new ResponseEntity<>(mapped, HttpStatus.OK);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }

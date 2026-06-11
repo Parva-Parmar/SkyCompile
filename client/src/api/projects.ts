@@ -45,7 +45,6 @@ export const createProject = async (name: string): Promise<Project> => {
 
 /** DELETE /api/v1/projects/:id */
 export const deleteProject = async (id: string) => {
-  console.log("delete start")
   return deleteAuthRequest(`/projects/${id}`);
 };
 

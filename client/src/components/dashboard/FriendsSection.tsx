@@ -62,18 +62,31 @@ export default function FriendsSection() {
     };
 
     const handleAccept = async (id: string) => {
-        await acceptFriendRequest(id);
-        loadAll();
+        try {
+            await acceptFriendRequest(id);
+            loadAll();
+        } catch (err: any) {
+            alert(err.message || "Failed to accept friend request");
+        }
     };
 
     const handleReject = async (id: string) => {
-        await rejectFriendRequest(id);
-        loadAll();
+        try {
+            await rejectFriendRequest(id);
+            loadAll();
+        } catch (err: any) {
+            alert(err.message || "Failed to reject friend request");
+        }
     };
 
     const handleRemove = async (id: string) => {
-        await removeFriend(id);
-        loadAll();
+        if (!confirm("Are you sure you want to remove this friend?")) return;
+        try {
+            await removeFriend(id);
+            loadAll();
+        } catch (err: any) {
+            alert(err.message || "Failed to remove friend");
+        }
     };
 
     /* =========================

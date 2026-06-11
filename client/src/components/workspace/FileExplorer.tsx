@@ -8,6 +8,7 @@ export default function FileExplorer({
     onCreateFolder,
     onDelete,
     onRename,
+    onDownload,
 }: {
     tree: FileNode[];
     onSelect: (path: string) => void;
@@ -15,14 +16,16 @@ export default function FileExplorer({
     onCreateFolder: () => void;
     onDelete: (path: string) => void;
     onRename: (oldPath: string, newPath: string) => void;
+    onDownload: (path?: string) => void;
 }) {
     return (
         <div className="h-full p-2 text-sm">
             <div className="flex justify-between mb-2">
                 <span className="font-semibold">EXPLORER</span>
                 <div className="space-x-2">
-                    <button onClick={onCreateFile}>📄</button>
-                    <button onClick={onCreateFolder}>📁</button>
+                    <button onClick={onCreateFile} title="New File">📄</button>
+                    <button onClick={onCreateFolder} title="New Folder">📁</button>
+                    <button onClick={() => onDownload()} title="Download Project">📥</button>
                 </div>
             </div>
 
@@ -34,6 +37,7 @@ export default function FileExplorer({
                     onSelect={onSelect}
                     onDelete={onDelete}
                     onRename={onRename}
+                    onDownload={onDownload}
                 />
             ))}
         </div>

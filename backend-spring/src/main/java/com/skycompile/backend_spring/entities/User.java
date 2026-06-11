@@ -31,6 +31,5 @@ public class User {
     private LocalDateTime createdAt;
     
     public User() {
-        System.out.println("DEBUG: User() constructor called - firstname='" + this.firstname + "', lastname='" + this.lastname + "'");
     }
 }

@@ -18,7 +18,7 @@ const getRoleIcon = (role: ProjectRole) => {
     case "VIEWER":
       return <Eye className="w-4 h-4 text-green-400" />;
     default:
-      return <Users className="w-4 h-4 text-gray-400" />;
+      return <Users className="w-4 h-4 text-[var(--text-muted)]" />;
   }
 };
 
@@ -31,7 +31,7 @@ const getRoleColor = (role: ProjectRole) => {
     case "VIEWER":
       return "text-green-400 bg-green-900/20 border-green-700";
     default:
-      return "text-gray-400 bg-gray-900/20 border-gray-700";
+      return "text-[var(--text-muted)] bg-[var(--bg-secondary)] border-[var(--border-color)]";
   }
 };
 
@@ -117,9 +117,9 @@ export default function CollaboratorList({ projectId, currentUserId, onUpdate }:
   if (members.length === 0) {
     return (
       <div className="p-6 text-center">
-        <Users className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-        <p className="text-gray-400">No collaborators yet</p>
-        <p className="text-gray-500 text-sm mt-2">Add team members to start collaborating</p>
+        <Users className="w-12 h-12 text-[var(--text-muted)] mx-auto mb-4" />
+        <p className="text-[var(--text-muted)]">No collaborators yet</p>
+        <p className="text-[var(--text-muted)] text-sm mt-2">Add team members to start collaborating</p>
       </div>
     );
   }
@@ -127,7 +127,7 @@ export default function CollaboratorList({ projectId, currentUserId, onUpdate }:
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+        <h3 className="text-lg font-semibold text-[var(--text-primary)] flex items-center gap-2">
           <Users className="w-5 h-5 text-blue-400" />
           Collaborators ({members.length})
         </h3>
@@ -141,27 +141,27 @@ export default function CollaboratorList({ projectId, currentUserId, onUpdate }:
           return (
             <div
               key={member.id}
-              className="flex items-center justify-between p-4 bg-gray-800 rounded-lg border border-gray-700 hover:border-gray-600 transition-colors"
+              className="flex items-center justify-between p-4 bg-[var(--bg-elevated)] rounded-lg border border-[var(--border-color)] hover:border-[var(--accent)] transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
-                  <span className="text-white font-medium">
+                <div className="w-10 h-10 bg-[var(--bg-secondary)] rounded-full flex items-center justify-center">
+                  <span className="text-[var(--text-primary)] font-medium">
                     {member.user.firstname.charAt(0)}
                     {member.user.lastname.charAt(0)}
                   </span>
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <p className="text-white font-medium">
+                    <p className="text-[var(--text-primary)] font-medium">
                       {member.user.firstname} {member.user.lastname}
                     </p>
                     {isCurrentUser && (
-                      <span className="text-xs text-gray-400 bg-gray-700 px-2 py-1 rounded">
+                      <span className="text-xs text-[var(--text-muted)] bg-[var(--bg-secondary)] px-2 py-1 rounded">
                         You
                       </span>
                     )}
                   </div>
-                  <p className="text-gray-400 text-sm">{member.user.email}</p>
+                  <p className="text-[var(--text-muted)] text-sm">{member.user.email}</p>
                 </div>
               </div>
 
@@ -172,7 +172,7 @@ export default function CollaboratorList({ projectId, currentUserId, onUpdate }:
                     <span className={`text-xs font-medium px-2 py-1 rounded border ${getRoleColor(member.role)}`}>
                       {member.role}
                     </span>
-                    <p className="text-gray-500 text-xs mt-1">
+                    <p className="text-[var(--text-muted)] text-xs mt-1">
                       {getRoleDescription(member.role)}
                     </p>
                   </div>
@@ -183,7 +183,7 @@ export default function CollaboratorList({ projectId, currentUserId, onUpdate }:
                     <button
                       onClick={() => handleRemoveMember(member.user.id, `${member.user.firstname} ${member.user.lastname}`)}
                       disabled={actionLoading === member.user.id}
-                      className="p-2 text-gray-400 hover:text-red-400 hover:bg-gray-700 rounded-lg transition-colors disabled:opacity-50"
+                      className="p-2 text-[var(--text-muted)] hover:text-red-400 hover:bg-[var(--bg-secondary)] rounded-lg transition-colors disabled:opacity-50"
                       title="Remove collaborator"
                     >
                       {actionLoading === member.user.id ? (
@@ -200,8 +200,8 @@ export default function CollaboratorList({ projectId, currentUserId, onUpdate }:
         })}
       </div>
 
-      <div className="mt-6 pt-4 border-t border-gray-700">
-        <p className="text-gray-500 text-xs">
+      <div className="mt-6 pt-4 border-t border-[var(--border-color)]">
+        <p className="text-[var(--text-muted)] text-xs">
           <strong>Roles:</strong> Owners can manage all aspects, Editors can edit and add members, Viewers can only view and comment.
         </p>
       </div>

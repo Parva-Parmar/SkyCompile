@@ -36,6 +36,11 @@ export default function Signup() {
     e.preventDefault();
     setMessage("");
 
+    if (formData.password !== formData.confirmPassword) {
+      setMessage("Passwords do not match!");
+      return;
+    }
+
     try {
       const res = await postRequest("/auth/signup", {
         firstname: formData.firstname,

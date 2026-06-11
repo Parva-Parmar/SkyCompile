@@ -11,8 +11,18 @@ interface Profile {
 }
 
 export default function ProfileSection() {
-    const [profile, setProfile] = useState<Profile | null>(null);
-    const [loading, setLoading] = useState(true);
+    const [profile, setProfile] = useState<Profile | null>(() => {
+        const stored = localStorage.getItem("user");
+        if (stored) {
+            try {
+                return JSON.parse(stored);
+            } catch (e) {
+                return null;
+            }
+        }
+        return null;
+    });
+    const [loading, setLoading] = useState(!profile);
 
     useEffect(() => {
         const fetchProfile = async () => {

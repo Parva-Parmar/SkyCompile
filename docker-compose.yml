@@ -26,6 +26,7 @@ services:
     container_name: skycompile-go
     ports:
       - "8082:8082"
+    privileged: true
     environment:
       - JWT_SECRET=super_secret_dev_key_123_upgraded_to_256_bits_for_skycompile!
     volumes:
@@ -45,7 +46,7 @@ services:
       - "5173:5173"
     environment:
       - VITE_USE_SPRING_BOOT=true
-      - VITE_COLLAB_ENABLED=true
+      - VITE_COLLAB_ENABLED=false
     depends_on:
       backend-spring:
         condition: service_healthy
